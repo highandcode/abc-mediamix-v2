@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+/* A single, intentional "short landscape" state — phones rotated
+   sideways, where height (not width) is the constraint. Used sparingly,
+   only where a section's fixed-viewport-height assumptions break down. */
+@custom-variant short (@media (max-height: 500px) and (orientation: landscape));
+
+@theme {
+  /* Brand — sampled directly from public/assets/abc-logo-master.png */
+  --color-navy: #262970;
+  --color-gold: #9f732c;
+  --color-gold-light: #c79a5c;
+  --color-gold-pale: #e4cfa4;
+  --color-charcoal: #3e3e3e;
+  --color-white: #ffffff;
+
+  /* Light backgrounds — warm off-white family, unchanged by the brand refresh */
+  --color-ivory: #f4f1ea;
+  --color-ivory-deep: #ece6d9;
+  --color-paper: #faf8f3;
+
+  /* Semantic text roles: primary heading/text -> navy, secondary/body -> charcoal */
+  --color-ink: var(--color-navy);
+  --color-ink-soft: var(--color-charcoal);
+
+  --font-display: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  /* Editorial serif — used only on inner (non-homepage) pages */
+  --font-serif: "Fraunces", "Georgia", serif;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-ivory);
+  color: var(--color-ink);
+  overflow-x: hidden;
+  font-family: var(--font-body);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  line-height: 1.5;
+}
+
+section {
+  position: relative;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-paper);
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.tracking-wide-label {
+  letter-spacing: 0.22em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
