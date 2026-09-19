@@ -30,6 +30,17 @@
   --font-serif: "Fraunces", "Georgia", serif;
 }
 
+/* Height of the fixed navbar (plus a little air) — full-viewport sections
+   start their content below it so nothing sits underneath. */
+:root {
+  --nav-h: 4.5rem;
+}
+@media (min-width: 1024px) {
+  :root {
+    --nav-h: 5rem;
+  }
+}
+
 html {
   scroll-behavior: auto;
 }
@@ -79,6 +90,76 @@ button {
 
 .tracking-wide-label {
   letter-spacing: 0.22em;
+}
+
+/* ---- Fit-to-viewport sizing --------------------------------------------
+   The homepage's sections are single "frames": each must be fully visible
+   in one screen at any window size. Anything whose natural size would
+   otherwise outgrow a short or narrow viewport is sized from the viewport
+   itself (svh / vw) rather than from fixed rem values. */
+
+/* Hero headline: four lines that fit both the column width and the height
+   left over once the copy and the CTA are accounted for. */
+.hero-headline {
+  font-size: min(9vw, 6svh, 4rem);
+}
+@media (min-width: 1024px) {
+  .hero-headline {
+    font-size: min(4.5rem, calc((100vw - 9rem) / 19), calc((100svh - 18rem) / 3.8));
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-headline {
+    font-size: min(2rem, 8svh, 5vw);
+  }
+}
+
+/* Approach wheel: one square "board" whose side (--s) every part of the
+   wheel — orbit radius, node pills, type — is derived from. It is capped by
+   width and by the height left after the heading and the detail row. */
+.approach-board {
+  --s: min(86vw, 600px, max(200px, calc(100svh - 20rem)));
+  width: var(--s);
+  height: var(--s);
+}
+@media (min-width: 640px) {
+  .approach-board {
+    --s: min(70vw, 600px, max(220px, calc(100svh - 17.75rem)));
+  }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .approach-board {
+    --s: max(180px, calc(100svh - 6.5rem));
+  }
+}
+
+/* Insights "silos" stage: a square that takes what's left of the viewport
+   after the heading and caption, up to its comfortable size. */
+.silo-stage {
+  --frame: clamp(110px, calc(100svh - 21rem), 300px);
+  width: var(--frame);
+  height: var(--frame);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .silo-stage {
+    --frame: clamp(90px, calc(100svh - 14rem), 200px);
+  }
+}
+
+/* Work gallery cards: as tall as the viewport allows once the heading is
+   accounted for, never taller than they look good at. */
+.work-card {
+  height: clamp(170px, calc(100svh - 17rem), 460px);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .work-card {
+    height: clamp(140px, calc(100svh - 10.5rem), 300px);
+  }
+}
+
+/* String-infinity headline: scales with the smaller of the width and height. */
+.string-line {
+  font-size: clamp(1.25rem, min(6.2vw, 7svh), 3rem);
 }
 
 @media (prefers-reduced-motion: reduce) {

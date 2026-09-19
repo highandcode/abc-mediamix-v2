@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import { prepareDraw } from "../lib/paths";
+import { skipPastPin } from "../lib/skipPin";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import PageTransition from "../components/editorial/PageTransition";
 import PageIndicator from "../components/editorial/PageIndicator";
 import EditorialLabel from "../components/editorial/EditorialLabel";
 import GoldThread from "../components/editorial/GoldThread";
 import StoryReveal from "../components/editorial/StoryReveal";
+import SkipPin from "../components/editorial/SkipPin";
 
 const STATEMENTS = [
   ["START", "WITH THE", "QUESTION."],
@@ -68,6 +70,7 @@ function StatementSequence() {
   const sectionRef = useRef<HTMLElement>(null);
   const threadRef = useRef<SVGPathElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -90,6 +93,8 @@ function StatementSequence() {
           pin: true,
         },
       });
+
+      triggerRef.current = tl.scrollTrigger ?? null;
 
       tl.to(thread, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
 
@@ -114,6 +119,7 @@ function StatementSequence() {
 
     return () => {
       window.removeEventListener("resize", onResize);
+      triggerRef.current = null;
       ctx.revert();
     };
   }, [reducedMotion]);
@@ -164,6 +170,10 @@ function StatementSequence() {
           </div>
         ))}
       </div>
+
+      {!reducedMotion && (
+        <SkipPin tone="light" onSkip={() => skipPastPin(triggerRef.current, sectionRef.current)} />
+      )}
     </section>
   );
 }

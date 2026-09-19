@@ -41,7 +41,7 @@ export default function FinalCTA() {
         "-=0.5"
       );
 
-      cinematic = registerCinematicSection(section, tl);
+      cinematic = registerCinematicSection(section, tl, { playWhenVisible: true });
     }, section);
 
     return () => {
@@ -54,9 +54,9 @@ export default function FinalCTA() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative flex min-h-[90vh] flex-col items-center justify-center overflow-hidden bg-navy px-6 py-28 text-center"
+      className="relative flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 pb-6 pt-[var(--nav-h)] text-center"
     >
-      <svg viewBox="0 0 300 120" className="h-16 w-40 sm:h-20 sm:w-48" aria-hidden="true">
+      <svg viewBox="0 0 300 120" className="h-16 w-40 short:h-10 short:w-24 sm:h-20 sm:w-48" aria-hidden="true">
         <path
           ref={pathRef}
           d={D}
@@ -68,7 +68,7 @@ export default function FinalCTA() {
       </svg>
 
       <div ref={contentRef} className="mt-6">
-        <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-ivory sm:text-6xl">
+        <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-ivory short:text-3xl sm:text-6xl">
           What could
           <br />
           your idea <span className="text-gold">become?</span>
@@ -76,13 +76,13 @@ export default function FinalCTA() {
 
         <a
           href="mailto:info@abcmediamix.com"
-          className="group mt-10 inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 text-[13px] font-semibold uppercase tracking-wide-label text-ink transition-transform hover:scale-105"
+          className="group mt-[min(2.5rem,4svh)] inline-flex items-center gap-3 rounded-full bg-gold px-8 py-4 text-[13px] font-semibold uppercase tracking-wide-label text-ink transition-transform hover:scale-105"
         >
           Let&apos;s find out
           <span className="transition-transform group-hover:translate-x-1" aria-hidden="true">&rarr;</span>
         </a>
 
-        <p className="mt-16 text-[10px] font-medium uppercase tracking-[0.35em] text-ivory/40">
+        <p className="mt-[min(4rem,6svh)] text-[10px] font-medium uppercase tracking-[0.35em] text-ivory/40">
           Ideas &bull; Media &bull; Impact
         </p>
       </div>

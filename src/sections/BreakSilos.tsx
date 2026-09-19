@@ -151,7 +151,7 @@ export default function BreakSilos() {
     <section
       id="insights"
       ref={sectionRef}
-      className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 py-24 short:min-h-0 short:pt-20 short:pb-6 text-ivory"
+      className="relative flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 pb-6 pt-[var(--nav-h)] text-ivory"
     >
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">NOT CHANNELS.</p>
@@ -160,7 +160,7 @@ export default function BreakSilos() {
         </h2>
       </div>
 
-      <div className="relative mt-14 h-[240px] w-[240px] text-ivory/80 short:mt-6 short:h-[130px] short:w-[130px] sm:h-[300px] sm:w-[300px]">
+      <div className="silo-stage relative mt-[min(3.5rem,5svh)] text-ivory/80">
         <svg
           className="pointer-events-none absolute -inset-x-20 top-1/2 -z-10 h-8 -translate-y-1/2 sm:-inset-x-32"
           viewBox="0 0 400 40"
@@ -191,7 +191,7 @@ export default function BreakSilos() {
         ))}
       </div>
 
-      <div className="relative mt-8 h-5 w-full text-center short:mt-3">
+      <div className="relative mt-[min(2rem,3svh)] h-5 w-full text-center">
         {siloScenes.map((scene, i) => (
           <span
             key={scene.id}

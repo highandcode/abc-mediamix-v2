@@ -6,6 +6,8 @@ export default function Curious() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [reveal, setReveal] = useState(28);
 
+  // Once the visitor has moved the reveal, it stays wherever they left it —
+  // the pointer leaving the headline doesn't snap it back to the teaser.
   const updateFromClientX = useCallback((clientX: number) => {
     const el = containerRef.current;
     if (!el) return;
@@ -15,7 +17,7 @@ export default function Curious() {
   }, []);
 
   return (
-    <section id="curious" className="relative overflow-hidden bg-ivory px-6 py-28 lg:py-36">
+    <section id="curious" className="relative flex h-[100svh] flex-col justify-center overflow-hidden bg-ivory px-6 pb-6 pt-[var(--nav-h)]">
       <div className="mx-auto max-w-4xl text-center">
         <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">LOOK CLOSER.</p>
         <p className="mt-2 text-xs text-ink-soft">There&apos;s more to this story &mdash; drag to reveal it.</p>
@@ -24,15 +26,14 @@ export default function Curious() {
           ref={containerRef}
           onMouseMove={(e) => updateFromClientX(e.clientX)}
           onTouchMove={(e) => updateFromClientX(e.touches[0].clientX)}
-          onMouseLeave={() => setReveal(28)}
-          className="relative mt-10 cursor-none select-none py-6"
+          className="relative mt-[min(2.5rem,4svh)] cursor-none select-none py-6 short:py-2"
         >
-          <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-ink/15 sm:text-5xl">
+          <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-ink/15 short:text-2xl sm:text-5xl">
             {HEADLINE}
           </h2>
           <h2
             aria-hidden="true"
-            className="absolute inset-0 top-6 font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-ink sm:text-5xl"
+            className="absolute inset-0 top-6 font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-ink short:top-2 short:text-2xl sm:text-5xl"
             style={{ clipPath: `inset(0 ${100 - reveal}% 0 0)` }}
           >
             {HEADLINE.split(" ").map((word, i) =>

@@ -1,6 +1,7 @@
 import { onLenisReady } from "./lenisInstance";
 import { getCinematicController } from "./cinematicSection";
 import { getScrubTrigger, onScrubBoundary } from "./scrubSection";
+import { ScrollTrigger } from "./gsap";
 import type Lenis from "lenis";
 
 /**
@@ -116,7 +117,9 @@ export class SectionNavigator {
   private measure() {
     this.frames = this.ids
       .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el))
+      // A section that's been dismissed (or hidden for any other reason)
+      // has no box — it isn't a frame anymore.
+      .filter((el): el is HTMLElement => Boolean(el) && el!.getBoundingClientRect().height > 0)
       .map((element, index) => ({
         id: element.id,
         index,
@@ -239,7 +242,9 @@ export class SectionNavigator {
    */
   goToId(id: string) {
     if (this.state !== "ready") return;
-    const targetIndex = this.frames.findIndex((f) => f.id === id);
+    // A dismissed interstitial resolves to whichever frame took its place.
+    const wanted = this.ids.indexOf(id);
+    const targetIndex = wanted === -1 ? -1 : this.frames.findIndex((f) => this.ids.indexOf(f.id) >= wanted);
     if (targetIndex === -1 || targetIndex === this.currentIndex) return;
     const direction: Direction = targetIndex > this.currentIndex ? "forward" : "backward";
     this.leavePassthrough();
@@ -313,14 +318,46 @@ export class SectionNavigator {
   }
 
   private afterAnimate(frame: Frame) {
+    this.dismissTransientBehind();
+
     if (frame.kind === "fit") {
       this.lenis?.stop();
       this.setState("ready");
+      // An interstitial has said its piece — hand off to the next section
+      // without waiting for another gesture.
+      if (getCinematicController(frame.element)?.transient) this.navigate("forward");
       return;
     }
     this.lenis?.start();
     this.setState("ready");
     this.enterPassthrough(frame);
+  }
+
+  /**
+   * Removes finished interstitials that now sit behind the current frame:
+   * hides them, drops them from the frame list, and re-pins the scroll
+   * position to the current frame (collapsing a section above shifts
+   * everything below it up).
+   */
+  private dismissTransientBehind() {
+    const current = this.frames[this.currentIndex];
+    if (!current) return;
+    const gone = this.frames.filter((f) => {
+      if (f.index >= this.currentIndex) return false;
+      const c = getCinematicController(f.element);
+      return Boolean(c?.transient && c.isDone());
+    });
+    if (gone.length === 0) return;
+
+    gone.forEach((f) => getCinematicController(f.element)?.dismiss());
+    this.frames = this.frames
+      .filter((f) => !gone.includes(f))
+      .map((f, index) => ({ ...f, index }));
+    this.currentIndex = this.frames.findIndex((f) => f.element === current.element);
+
+    this.lenis?.resize();
+    this.lenis?.scrollTo(current.element, { immediate: true, force: true });
+    ScrollTrigger.refresh();
   }
 
   private enterPassthrough(frame: Frame) {

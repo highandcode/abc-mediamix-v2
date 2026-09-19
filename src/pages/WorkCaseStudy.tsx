@@ -2,8 +2,11 @@ import { useEffect, useRef } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { gsap, ScrollTrigger } from "../lib/gsap";
 import { prepareDraw } from "../lib/paths";
+import { skipPastPin } from "../lib/skipPin";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { caseStudies, getCaseStudy, type CaseStudy } from "../data/work";
+import { SliderButton, useSliderTrack } from "../components/SliderControls";
+import SkipPin from "../components/editorial/SkipPin";
 import PageTransition from "../components/editorial/PageTransition";
 import PageProgress from "../components/editorial/PageProgress";
 import PageIndicator from "../components/editorial/PageIndicator";
@@ -89,6 +92,7 @@ function ThreeStageSpread({ study }: { study: CaseStudy }) {
   const threadRef = useRef<SVGPathElement>(null);
   const loopRef = useRef<SVGPathElement>(null);
   const panelRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const triggerRef = useRef<ScrollTrigger | null>(null);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -114,6 +118,8 @@ function ThreeStageSpread({ study }: { study: CaseStudy }) {
         },
       });
 
+      triggerRef.current = tl.scrollTrigger ?? null;
+
       tl.to(thread, { strokeDashoffset: 0, ease: "none", duration: 1 }, 0);
       tl.to(loop, { strokeDashoffset: 0, ease: "none", duration: 0.4 }, 0.62);
 
@@ -137,6 +143,7 @@ function ThreeStageSpread({ study }: { study: CaseStudy }) {
 
     return () => {
       window.removeEventListener("resize", onResize);
+      triggerRef.current = null;
       ctx.revert();
     };
   }, [reducedMotion]);
@@ -201,53 +208,17 @@ function ThreeStageSpread({ study }: { study: CaseStudy }) {
           })}
         </div>
       </div>
+
+      {!reducedMotion && <SkipPin onSkip={() => skipPastPin(triggerRef.current, sectionRef.current)} />}
     </section>
   );
 }
 
 function AmplificationStrip({ study }: { study: CaseStudy }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const reducedMotion = useReducedMotion();
-
-  useEffect(() => {
-    if (reducedMotion) return;
-    const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track) return;
-
-    const ctx = gsap.context(() => {
-      const scrollLength = () =>
-        Math.max(track.scrollWidth - (track.parentElement?.clientWidth ?? 0), 0);
-
-      const tween = gsap.to(track, {
-        x: () => -scrollLength(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => "+=" + scrollLength(),
-          scrub: 1,
-          pin: true,
-          invalidateOnRefresh: true,
-        },
-      });
-
-      return () => tween.scrollTrigger?.kill();
-    }, section);
-
-    const onResize = () => ScrollTrigger.refresh();
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      ctx.revert();
-    };
-  }, [reducedMotion]);
+  const { trackRef, edges, updateEdges, slide } = useSliderTrack({ autoScroll: true });
 
   return (
     <section
-      ref={sectionRef}
       id="amplification"
       className="relative overflow-hidden bg-navy py-20 text-ivory lg:py-0"
     >
@@ -262,11 +233,16 @@ function AmplificationStrip({ study }: { study: CaseStudy }) {
           </p>
         </StoryReveal>
 
-        <div className="overflow-hidden">
-          <div ref={trackRef} className={`flex gap-5 ${reducedMotion ? "flex-wrap" : "w-max flex-nowrap"}`}>
+        <div className="relative min-w-0">
+          <div
+            ref={trackRef}
+            onScroll={updateEdges}
+            className="flex gap-5 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {study.mediums.map((medium, i) => (
               <div
                 key={medium}
+                data-slide
                 className="flex h-[220px] w-[220px] shrink-0 flex-col justify-between border border-ivory/15 p-6 sm:h-[260px] sm:w-[260px]"
                 style={{ background: "rgba(244,241,234,0.03)" }}
               >
@@ -282,6 +258,9 @@ function AmplificationStrip({ study }: { study: CaseStudy }) {
               <span className="text-xs text-ivory/40">and further, still.</span>
             </div>
           </div>
+
+          <SliderButton direction="prev" tone="dark" disabled={edges.start} onClick={() => slide(-1)} className="left-2" />
+          <SliderButton direction="next" tone="dark" disabled={edges.end} onClick={() => slide(1)} className="right-2" />
         </div>
       </div>
     </section>

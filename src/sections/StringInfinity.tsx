@@ -71,11 +71,11 @@ export default function StringInfinity() {
     <section
       id="string-infinity"
       ref={sectionRef}
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden bg-navy short:min-h-0 short:py-6"
+      className="relative flex h-[100svh] items-center justify-center overflow-hidden bg-navy pt-[var(--nav-h)] pb-6"
     >
       <svg
         viewBox="0 0 600 400"
-        className="h-auto w-full max-w-3xl px-10 short:max-w-xs short:px-4"
+        className="h-auto max-h-full w-full max-w-3xl px-10 short:px-4"
         aria-hidden="true"
       >
         {[-18, 18].map((rot, i) => (
@@ -105,12 +105,12 @@ export default function StringInfinity() {
 
       <div
         ref={textRef}
-        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-1 text-center"
+        className="pointer-events-none absolute inset-x-0 bottom-0 top-[var(--nav-h)] flex flex-col items-center justify-center gap-1 text-center"
       >
-        <span className="font-display text-3xl font-extrabold uppercase tracking-tight text-ivory short:text-lg sm:text-5xl">
+        <span className="font-display string-line font-extrabold uppercase tracking-tight text-ivory">
           One idea.
         </span>
-        <span className="font-display text-3xl font-extrabold uppercase tracking-tight text-gold short:text-lg sm:text-5xl">
+        <span className="font-display string-line font-extrabold uppercase tracking-tight text-gold">
           Infinite possibilities.
         </span>
       </div>
