@@ -53,14 +53,18 @@ export default function InsightsArticle() {
             </div>
             <StoryReveal delay={120}>
               <div className="h-[18svh] md:h-[min(calc(100svh-var(--nav-h)-5rem),30rem)] short:h-[calc(100svh-var(--nav-h)-3rem)]">
-                <EditorialImage tone={article.tone} ratio="aspect-auto" className="h-full" />
+                <EditorialImage tone={article.tone} src={article.image} ratio="aspect-auto" className="h-full" />
               </div>
             </StoryReveal>
           </div>
         </section>
 
         {chunks.map((blocks, i) => (
-          <ArticleFrames key={i} blocks={blocks} imageTone={i + 1 === imageAfter ? (article.tone + 2) % 5 : null} />
+          <ArticleFrames
+            key={i}
+            blocks={blocks}
+            image={i + 1 === imageAfter ? { tone: article.tone, src: article.image } : null}
+          />
         ))}
       </article>
 
@@ -88,8 +92,14 @@ export default function InsightsArticle() {
   );
 }
 
-/** One frame of body copy, followed by an image-only frame when `imageTone` is set. */
-function ArticleFrames({ blocks, imageTone }: { blocks: ArticleBlock[]; imageTone: number | null }) {
+/** One frame of body copy, followed by an image-only frame when `image` is set. */
+function ArticleFrames({
+  blocks,
+  image,
+}: {
+  blocks: ArticleBlock[];
+  image: { tone: number; src: string } | null;
+}) {
   return (
     <>
       <section data-frame className="frame bg-ivory px-6 lg:px-12">
@@ -103,12 +113,12 @@ function ArticleFrames({ blocks, imageTone }: { blocks: ArticleBlock[]; imageTon
           </div>
         </div>
       </section>
-      {imageTone !== null && (
+      {image && (
         <section data-frame className="frame bg-ivory px-6 lg:px-12">
           <div className="frame-inner">
             <StoryReveal>
               <div className="mx-auto h-[min(calc(100svh-var(--nav-h)-5rem),34rem)] max-w-5xl">
-                <EditorialImage tone={imageTone} ratio="aspect-auto" className="h-full" />
+                <EditorialImage tone={image.tone} src={image.src} ratio="aspect-auto" className="h-full" />
               </div>
             </StoryReveal>
           </div>

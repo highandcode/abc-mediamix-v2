@@ -44,7 +44,13 @@ export default function WorkCaseStudy() {
 function CoverSpread({ campaign }: { campaign: Campaign }) {
   return (
     <section data-frame className="frame isolate justify-end bg-navy px-6 pb-14 text-ivory lg:px-12 lg:pb-20">
-      <EditorialImage tone={campaign.tone} src={campaign.heroImage} ratio="aspect-auto" className="absolute inset-0 -z-10 h-full">
+      <EditorialImage
+        tone={campaign.tone}
+        src={campaign.heroImage}
+        focalPoint={campaign.heroFocalPoint}
+        ratio="aspect-auto"
+        className="absolute inset-0 -z-10 h-full"
+      >
         <div className="absolute inset-0 bg-gradient-to-t from-navy via-navy/40 to-navy/10" />
       </EditorialImage>
 
@@ -149,7 +155,13 @@ function AmplificationStrip({ campaign, samples }: { campaign: Campaign; samples
             {samples.map((sample, i) => (
               <div key={sample.id} data-slide className="slide-card flex shrink-0 flex-col overflow-hidden border border-ivory/15">
                 <div className="relative h-[55%] w-full">
-                  <EditorialImage tone={sample.tone ?? campaign.tone} src={sample.image} ratio="aspect-auto" className="h-full" />
+                  <EditorialImage
+                    tone={sample.tone ?? campaign.tone}
+                    src={sample.image}
+                    focalPoint={sample.focalPoint}
+                    ratio="aspect-auto"
+                    className="h-full"
+                  />
                 </div>
                 <div className="flex flex-1 flex-col justify-between p-4" style={{ background: "rgba(244,241,234,0.03)" }}>
                   <span className="font-display text-2xl font-bold text-gold/40">{String(i + 1).padStart(2, "0")}</span>

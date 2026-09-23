@@ -16,6 +16,8 @@ export type WorkSample = {
   tone?: number;
   /** Set when this piece is also part of a full campaign story under /work/:slug. */
   campaignSlug?: string;
+  /** CSS object-position, for a source whose subject isn't centered. */
+  focalPoint?: string;
 };
 
 export const workSamples: WorkSample[] = [
@@ -146,7 +148,7 @@ export const workSamples: WorkSample[] = [
     client: "AVJ Group",
     medium: "television",
     caption: "AVJ Tower corporate TVC",
-    image: "/assets/work/campaigns/avj/avj-hero-graded.jpg",
+    image: "/assets/work/campaigns/avj/avj-tv-sample-graded.jpg",
     tone: 0,
     campaignSlug: "avj",
   },
@@ -225,15 +227,6 @@ export const workSamples: WorkSample[] = [
     campaignSlug: "cyberwalk",
   },
   {
-    id: "cyberwalk-magazine-night",
-    client: "Aarone Group — Cyberwalk",
-    medium: "print",
-    caption: "Magazine ad, night skyline treatment",
-    image: "/assets/work/campaigns/cyberwalk/cyberwalk-hero-graded.jpg",
-    tone: 0,
-    campaignSlug: "cyberwalk",
-  },
-  {
     id: "cyberwalk-magazine-day",
     client: "Aarone Group — Cyberwalk",
     medium: "print",
@@ -241,6 +234,7 @@ export const workSamples: WorkSample[] = [
     image: "/assets/work/campaigns/cyberwalk/cyberwalk-magazine-day-graded.jpg",
     tone: 2,
     campaignSlug: "cyberwalk",
+    focalPoint: "center 78%",
   },
   {
     id: "cyberwalk-flap",

@@ -21,6 +21,7 @@ export default function EditorialImage({
   className,
   caption,
   src,
+  focalPoint = "center",
   children,
 }: {
   tone?: number;
@@ -29,6 +30,10 @@ export default function EditorialImage({
   caption?: string;
   /** A real image; when set it covers the gradient plate (which stays as its fallback). */
   src?: string;
+  /** CSS object-position — for a source whose subject isn't centered (e.g. a tall
+   *  building render where the lit facade sits low in frame), so a crop into a
+   *  wider/shorter container doesn't land on empty sky or dense text instead. */
+  focalPoint?: string;
   children?: ReactNode;
 }) {
   const light = tone === 2;
@@ -45,6 +50,7 @@ export default function EditorialImage({
             decoding="async"
             draggable={false}
             className="absolute inset-0 h-full w-full object-cover"
+            style={{ objectPosition: focalPoint }}
           />
         )}
         <svg

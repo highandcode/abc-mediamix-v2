@@ -5,6 +5,9 @@ export type Article = {
   dek: string;
   tone: number;
   size: "cover" | "feature" | "brief";
+  /** Original abstract cover art in the site's own palette — these are opinion
+   *  pieces, not client work, so there's no real campaign photography to use. */
+  image: string;
   body: { heading?: string; text?: string; quote?: string }[];
 };
 
@@ -22,6 +25,7 @@ export const articles: Article[] = [
     dek: "Every brand can be seen. Fewer can be remembered. Fewer still can be believed.",
     tone: 0,
     size: "cover",
+    image: "/assets/insights/attention-isnt-enough.jpg",
     body: [
       {
         text: "For a decade, the industry optimised for one metric: did they see it? The answer was almost always yes. Impressions were never the problem — impact was.",
@@ -49,6 +53,7 @@ export const articles: Article[] = [
     dek: "Most campaigns don't fail in execution. They fail three weeks earlier, in a room nobody remembers.",
     tone: 1,
     size: "feature",
+    image: "/assets/insights/the-cost-of-a-good-brief.jpg",
     body: [
       { text: "A weak brief is rarely obvious at the time. It reads clearly, it has a deadline, it has a budget line. What it doesn't have is a question worth answering." },
       { heading: "Start with the question, not the deliverable.", text: "Every brief that has produced work worth remembering began with a question the team didn't already know the answer to." },
@@ -62,6 +67,7 @@ export const articles: Article[] = [
     dek: "Channels are where an idea travels. They were never meant to be where it's born.",
     tone: 2,
     size: "feature",
+    image: "/assets/insights/media-plans-are-not-ideas.jpg",
     body: [
       { text: "It's an easy trap: build the plan first, then find something to put in it. The work that lasts happens in the opposite order." },
       { heading: "Start with where the idea belongs — not where the budget is biggest.", text: "Some ideas are built for a fifteen-second film. Others only work as a single line on a hoarding. The idea decides the medium, not the other way round." },
@@ -74,6 +80,7 @@ export const articles: Article[] = [
     dek: "Sometimes the most effective thing a brand can do is leave a sentence unfinished.",
     tone: 3,
     size: "brief",
+    image: "/assets/insights/silence-as-strategy.jpg",
     body: [
       { text: "Audiences don't just consume ideas — they complete them. The campaigns that get talked about are often the ones that leave room to." },
     ],
@@ -85,6 +92,7 @@ export const articles: Article[] = [
     dek: "Not free media. Media the idea deserved.",
     tone: 4,
     size: "brief",
+    image: "/assets/insights/what-earned-really-means.jpg",
     body: [
       { text: "Earned coverage isn't a lucky byproduct of a paid plan — it's evidence the idea was strong enough to move on its own." },
     ],

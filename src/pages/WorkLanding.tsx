@@ -71,7 +71,13 @@ function CampaignSpotlights() {
                 to={`/work/${c.slug}`}
                 className="group block h-[38svh] lg:h-[min(calc(100svh-var(--nav-h)-9rem),30rem)] short:h-[calc(100svh-var(--nav-h)-7rem)]"
               >
-                <EditorialImage tone={c.tone} src={c.heroImage} ratio="aspect-auto" className="h-full">
+                <EditorialImage
+                  tone={c.tone}
+                  src={c.heroImage}
+                  focalPoint={c.heroFocalPoint}
+                  ratio="aspect-auto"
+                  className="h-full"
+                >
                   <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
                     <p className="text-[10px] font-semibold uppercase tracking-wide-label text-ivory/70">{c.client}</p>
                     <h2 className="mt-1 font-display text-xl font-bold uppercase leading-snug text-ivory sm:text-2xl">
@@ -131,7 +137,13 @@ function Gallery() {
               const tile = (
                 <div className="group overflow-hidden border border-ink/10 bg-ivory">
                   <div className="aspect-[4/5] w-full">
-                    <EditorialImage tone={sample.tone} src={sample.image} ratio="aspect-auto" className="h-full" />
+                    <EditorialImage
+                      tone={sample.tone}
+                      src={sample.image}
+                      focalPoint={sample.focalPoint}
+                      ratio="aspect-auto"
+                      className="h-full"
+                    />
                   </div>
                   <div className="p-2.5">
                     <p className="truncate text-[11px] font-semibold uppercase tracking-wide-label text-ink">

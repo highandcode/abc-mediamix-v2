@@ -21,6 +21,8 @@ export type Campaign = {
   coverHeading: string[];
   teaser: string;
   heroImage: string;
+  /** CSS object-position for heroImage, for a source whose subject isn't centered. */
+  heroFocalPoint?: string;
   tone: number;
   stages: {
     brief: CaseStage;
@@ -73,6 +75,7 @@ export const campaigns: Campaign[] = [
     teaser:
       "An IT park in Manesar, competing for attention against established Gurgaon addresses — sold on credentials, not just renders, across TV, print, magazine, email and web.",
     heroImage: "/assets/work/campaigns/cyberwalk/cyberwalk-hero-graded.jpg",
+    heroFocalPoint: "center 78%",
     tone: 0,
     stages: {
       brief: {

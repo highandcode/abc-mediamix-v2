@@ -41,7 +41,7 @@ export default function InsightsLanding() {
           >
             <StoryReveal>
               <div className="h-[22svh] lg:h-[min(calc(100svh-var(--nav-h)-11rem),30rem)] short:h-[calc(100svh-var(--nav-h)-6rem)]">
-                <EditorialImage tone={cover.tone} ratio="aspect-auto" className="h-full" />
+                <EditorialImage tone={cover.tone} src={cover.image} ratio="aspect-auto" className="h-full" />
               </div>
             </StoryReveal>
             <StoryReveal delay={100} className="flex flex-col justify-center">
@@ -68,7 +68,7 @@ export default function InsightsLanding() {
             <StoryReveal key={article.slug} delay={i * 80}>
               <Link to={`/insights/${article.slug}`} className="group block">
                 <div className="h-[13svh] sm:h-[clamp(80px,calc(var(--frame-h)-11rem),380px)]">
-                  <EditorialImage tone={article.tone} ratio="aspect-auto" className="h-full" />
+                  <EditorialImage tone={article.tone} src={article.image} ratio="aspect-auto" className="h-full" />
                 </div>
                 <div className="mt-[min(2svh,1.25rem)]">
                   <EditorialLabel>{article.kicker}</EditorialLabel>

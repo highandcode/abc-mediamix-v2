@@ -62,6 +62,7 @@ export default function Work() {
                   loading="lazy"
                   decoding="async"
                   draggable={false}
+                  style={{ objectPosition: c.heroFocalPoint ?? "center" }}
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Navy fade: keeps the title and chips legible over any photo. */}
