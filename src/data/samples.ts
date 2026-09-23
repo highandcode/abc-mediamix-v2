@@ -24,7 +24,7 @@ export const workSamples: WorkSample[] = [
     client: "Apollo Hospitals",
     medium: "print",
     caption: "Full-page press ad — internationally trained doctors campaign",
-    image: "/assets/work/samples/print/apollo-hospitals.png",
+    image: "/assets/work/samples/print/apollo-hospitals.jpg",
     tone: 2,
   },
   {
@@ -64,7 +64,7 @@ export const workSamples: WorkSample[] = [
     client: "ABC Mediamix (est. as Sensation Design Studio)",
     medium: "digital",
     caption: "Our own studio site, from the archives",
-    image: "/assets/work/samples/digital/abc-legacy-web-1.png",
+    image: "/assets/work/samples/digital/abc-legacy-web-1.jpg",
     tone: 0,
   },
   {
@@ -72,7 +72,7 @@ export const workSamples: WorkSample[] = [
     client: "ABC Mediamix (est. as Sensation Design Studio)",
     medium: "digital",
     caption: "Our own studio site, an earlier layout",
-    image: "/assets/work/samples/digital/abc-legacy-web-2.png",
+    image: "/assets/work/samples/digital/abc-legacy-web-2.jpg",
     tone: 0,
   },
   {
@@ -104,7 +104,7 @@ export const workSamples: WorkSample[] = [
     client: "Miracle Events & Entertainment",
     medium: "stationery",
     caption: "Visiting card design",
-    image: "/assets/work/samples/stationery/miracle-events-1.png",
+    image: "/assets/work/samples/stationery/miracle-events-1.jpg",
     tone: 0,
   },
   {
@@ -112,7 +112,7 @@ export const workSamples: WorkSample[] = [
     client: "Miracle Events & Entertainment",
     medium: "stationery",
     caption: "Visiting card design, alternate run",
-    image: "/assets/work/samples/stationery/miracle-events-2.png",
+    image: "/assets/work/samples/stationery/miracle-events-2.jpg",
     tone: 0,
   },
   {
@@ -120,7 +120,7 @@ export const workSamples: WorkSample[] = [
     client: "PCS Appliances",
     medium: "stationery",
     caption: "Business card, two layout options",
-    image: "/assets/work/samples/stationery/pcs-appliances.png",
+    image: "/assets/work/samples/stationery/pcs-appliances.jpg",
     tone: 0,
   },
   {
@@ -128,7 +128,7 @@ export const workSamples: WorkSample[] = [
     client: "GHSIMR — Kosmos",
     medium: "events",
     caption: "Inter-college management fest identity",
-    image: "/assets/work/samples/events/ghsimr-kosmos.png",
+    image: "/assets/work/samples/events/ghsimr-kosmos.jpg",
     tone: 0,
   },
   {

@@ -52,7 +52,7 @@ function Profile() {
       <div className="frame-inner grid grid-cols-1 items-center gap-[min(3svh,1.5rem)] md:grid-cols-[0.8fr_1.2fr] md:gap-12 lg:gap-20">
         <StoryReveal className="md:justify-self-center">
           <div className="h-[24svh] md:h-[min(calc(100svh-var(--nav-h)-5rem),36rem)] md:aspect-[4/5]">
-            <EditorialImage tone={0} ratio="aspect-auto" className="h-full" src="/assets/about-billboard.png" />
+            <EditorialImage tone={0} ratio="aspect-auto" className="h-full" src="/assets/about-billboard.jpg" />
           </div>
         </StoryReveal>
         <StoryReveal delay={100}>
