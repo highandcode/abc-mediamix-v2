@@ -1,25 +1,35 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { motion } from "framer-motion";
+import { useSectionNavigator } from "../../hooks/useSectionNavigator";
+import { startFrameAudit } from "../../lib/frameGuard";
+import FrameProgress from "./FrameProgress";
 
 /**
- * Shared enter/exit for inner pages. The homepage itself is intentionally
- * left unwrapped so its own first-load experience never changes — this
- * only governs navigation between the inner "publication" pages.
+ * Shared shell for inner pages: the enter/exit fade, plus the section
+ * navigator — every `[data-frame]` section inside is one frame, and a
+ * wheel/swipe/key gesture slides to the next, exactly as on the homepage.
+ * (The homepage names its frames explicitly and isn't wrapped in this.)
+ *
+ * The transition is opacity-only on purpose: a moving wrapper would put the
+ * frames off their resting position while the navigator measures them, and
+ * would turn the fixed page chrome inside it into transformed content.
  */
 export default function PageTransition({ children }: { children: ReactNode }) {
+  useSectionNavigator();
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    return startFrameAudit();
+  }, []);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 18 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -18 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <motion.div
-        className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-px origin-left bg-gold"
-        initial={{ scaleX: 0, opacity: 1 }}
-        animate={{ scaleX: 1, opacity: 0 }}
-        transition={{ duration: 0.7, ease: "easeInOut" }}
-      />
+      <FrameProgress />
       {children}
     </motion.div>
   );

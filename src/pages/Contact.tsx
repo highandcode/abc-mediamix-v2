@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type CSSProperties, type FormEvent } from "react";
 import PageTransition from "../components/editorial/PageTransition";
 import PageIndicator from "../components/editorial/PageIndicator";
 import EditorialLabel from "../components/editorial/EditorialLabel";
@@ -40,32 +40,34 @@ export default function Contact() {
     <PageTransition>
       <PageIndicator label="ABC / CONTACT" />
 
-      <section className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-ivory px-6 py-32 lg:px-12">
-        <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-16 lg:grid-cols-[1fr_1fr] lg:gap-24">
+      <section data-frame className="frame bg-ivory px-6 lg:px-12">
+        <div className="frame-inner grid grid-cols-1 gap-[min(3svh,1.5rem)] lg:grid-cols-2 lg:items-center lg:gap-24 short:grid-cols-2 short:items-center short:gap-8">
           <div>
             <StoryReveal>
               <EditorialLabel>ABC / CONTACT</EditorialLabel>
             </StoryReveal>
             <StoryReveal delay={90}>
-              <h1 className="mt-4 font-display text-6xl font-extrabold uppercase leading-[0.9] tracking-tight text-ink sm:text-8xl">
-                Next
-                <br />
+              <h1
+                className="frame-display mt-3 font-display font-extrabold uppercase tracking-tight text-ink"
+                style={{ "--chars": 10 } as CSSProperties}
+              >
+                Next <br className="hidden sm:inline" />
                 <span className="text-gold">page?</span>
               </h1>
             </StoryReveal>
             <StoryReveal delay={180}>
-              <p className="mt-6 max-w-sm font-serif text-xl italic text-ink-soft">
+              <p className="mt-[min(2.4svh,1.5rem)] max-w-sm font-serif text-base italic text-ink-soft sm:text-xl short:text-sm">
                 Every idea starts somewhere. Tell us what you&apos;re building.
               </p>
             </StoryReveal>
-            <StoryReveal delay={260} className="mt-12 hidden lg:block">
-              <GoldThread variant="loop" className="w-48" />
+            <StoryReveal delay={260} className="mt-[min(4svh,3rem)] hidden lg:block short:hidden">
+              <GoldThread variant="loop" className="w-40" />
             </StoryReveal>
           </div>
 
           <StoryReveal delay={140}>
             {sent ? (
-              <div className="flex h-full min-h-[320px] flex-col items-center justify-center text-center">
+              <div className="flex h-full min-h-[200px] flex-col items-center justify-center text-center">
                 <GoldThread variant="loop" className="w-32" />
                 <p className="mt-6 font-display text-2xl font-bold uppercase tracking-tight text-ink">
                   Opening your inbox&hellip;
@@ -75,11 +77,11 @@ export default function Contact() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <form onSubmit={handleSubmit} className="flex flex-col gap-[min(2.4svh,1.25rem)]">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-[min(2.4svh,1.25rem)] sm:gap-x-6">
                   {FIELDS.map((field) => (
                     <label key={field.name} className="block">
-                      <span className="text-[11px] font-semibold uppercase tracking-wide-label text-ink-soft">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide-label text-ink-soft sm:text-[11px]">
                         {field.label}
                         {field.required && <span className="text-gold"> *</span>}
                       </span>
@@ -87,26 +89,26 @@ export default function Contact() {
                         name={field.name}
                         type={field.type}
                         required={field.required}
-                        className="mt-2 w-full border-0 border-b border-ink/20 bg-transparent py-2 text-base text-ink outline-none transition-colors focus:border-gold"
+                        className="mt-1 w-full border-0 border-b border-ink/20 bg-transparent py-1.5 text-base text-ink outline-none transition-colors focus:border-gold short:py-0.5"
                       />
                     </label>
                   ))}
                 </div>
 
                 <label className="block">
-                  <span className="text-[11px] font-semibold uppercase tracking-wide-label text-ink-soft">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide-label text-ink-soft sm:text-[11px]">
                     Tell us a little about it
                   </span>
                   <textarea
                     name="message"
-                    rows={4}
-                    className="mt-2 w-full resize-none border-0 border-b border-ink/20 bg-transparent py-2 text-base text-ink outline-none transition-colors focus:border-gold"
+                    rows={3}
+                    className="mt-1 w-full resize-none border-0 border-b border-ink/20 bg-transparent py-1.5 text-base text-ink outline-none transition-colors focus:border-gold short:h-9 short:py-0.5"
                   />
                 </label>
 
                 <button
                   type="submit"
-                  className="group mt-4 inline-flex w-fit items-center gap-3 rounded-full bg-gold px-8 py-4 text-[13px] font-semibold uppercase tracking-wide-label text-ink transition-transform hover:scale-105"
+                  className="group mt-1 inline-flex w-fit items-center gap-3 rounded-full bg-gold px-7 py-3 short:py-2 text-[12px] font-semibold uppercase tracking-wide-label text-ink transition-transform hover:scale-105 sm:text-[13px]"
                 >
                   Send the first page
                   <span aria-hidden="true" className="transition-transform group-hover:translate-x-1">

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { articles, issue } from "../data/insights";
 import PageTransition from "../components/editorial/PageTransition";
@@ -6,6 +7,8 @@ import EditorialLabel from "../components/editorial/EditorialLabel";
 import EditorialImage from "../components/editorial/EditorialImage";
 import StoryReveal from "../components/editorial/StoryReveal";
 
+// Every section below is one frame (`data-frame`): one screen tall, and the
+// section navigator slides between them. See `.frame` in globals.css.
 export default function InsightsLanding() {
   const cover = articles.find((a) => a.size === "cover")!;
   const rest = articles.filter((a) => a.slug !== cover.slug);
@@ -16,11 +19,12 @@ export default function InsightsLanding() {
     <PageTransition>
       <PageIndicator label="ABC / INSIGHTS" />
 
-      <section className="relative bg-ivory px-6 pb-10 pt-32 lg:px-12 lg:pt-40">
-        <div className="mx-auto max-w-[1440px]">
+      {/* Masthead + cover story */}
+      <section data-frame className="frame bg-ivory px-6 lg:px-12">
+        <div className="frame-inner">
           <StoryReveal>
-            <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-ink/10 pb-6">
-              <span className="font-display text-lg font-extrabold uppercase tracking-tight text-ink">
+            <div className="flex flex-wrap items-baseline justify-between gap-4 border-b border-ink/10 pb-[min(2svh,1rem)]">
+              <span className="font-display text-base font-extrabold uppercase tracking-tight text-ink sm:text-lg">
                 {issue.name}
               </span>
               <div className="flex items-center gap-4 text-[11px] font-medium tracking-wide-label text-ink-soft">
@@ -30,23 +34,26 @@ export default function InsightsLanding() {
               </div>
             </div>
           </StoryReveal>
-        </div>
-      </section>
 
-      {/* Cover story */}
-      <section className="relative bg-ivory px-6 pb-20 lg:px-12 lg:pb-28">
-        <div className="mx-auto max-w-[1440px]">
-          <Link to={`/insights/${cover.slug}`} className="group grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+          <Link
+            to={`/insights/${cover.slug}`}
+            className="group mt-[min(3svh,2rem)] grid grid-cols-1 gap-[min(3svh,1.5rem)] lg:grid-cols-2 lg:items-center lg:gap-16 short:grid-cols-2 short:items-center short:gap-8"
+          >
             <StoryReveal>
-              <EditorialImage tone={cover.tone} ratio="aspect-[4/3]" />
+              <div className="h-[22svh] lg:h-[min(calc(100svh-var(--nav-h)-11rem),30rem)] short:h-[calc(100svh-var(--nav-h)-6rem)]">
+                <EditorialImage tone={cover.tone} ratio="aspect-auto" className="h-full" />
+              </div>
             </StoryReveal>
             <StoryReveal delay={100} className="flex flex-col justify-center">
               <EditorialLabel>{cover.kicker}</EditorialLabel>
-              <h1 className="mt-4 font-display text-4xl font-extrabold uppercase leading-[0.98] tracking-tight text-ink transition-colors group-hover:text-gold sm:text-6xl">
+              <h1
+                className="frame-title mt-[min(1.8svh,1rem)] font-display font-extrabold uppercase tracking-tight text-ink transition-colors group-hover:text-gold"
+                style={{ "--chars": 13 } as CSSProperties}
+              >
                 {cover.title}
               </h1>
-              <p className="mt-5 max-w-md font-serif text-lg italic text-ink-soft">{cover.dek}</p>
-              <span className="mt-6 inline-flex w-fit items-center gap-2 text-[11px] font-semibold uppercase tracking-wide-label text-gold">
+              <p className="frame-text mt-[min(2svh,1.25rem)] max-w-md font-serif italic text-ink-soft">{cover.dek}</p>
+              <span className="mt-[min(2.4svh,1.5rem)] inline-flex w-fit items-center gap-2 text-[11px] font-semibold uppercase tracking-wide-label text-gold">
                 Read the story <span aria-hidden="true">→</span>
               </span>
             </StoryReveal>
@@ -55,44 +62,47 @@ export default function InsightsLanding() {
       </section>
 
       {/* Feature stories — asymmetric editorial grid, not blog cards */}
-      <section className="relative bg-paper px-6 py-20 lg:px-12 lg:py-28">
-        <div className="mx-auto max-w-[1440px]">
-          <div className="grid grid-cols-1 gap-x-12 gap-y-16 lg:grid-cols-2">
-            {features.map((article, i) => (
-              <StoryReveal key={article.slug} delay={i * 80} className={i === 0 ? "lg:mt-16" : ""}>
-                <Link to={`/insights/${article.slug}`} className="group block">
-                  <EditorialImage tone={article.tone} ratio="aspect-[16/10]" />
-                  <div className="mt-5">
-                    <EditorialLabel>{article.kicker}</EditorialLabel>
-                    <h2 className="mt-2 font-display text-2xl font-bold leading-snug text-ink transition-colors group-hover:text-gold sm:text-3xl">
-                      {article.title}
-                    </h2>
-                    <p className="mt-2 max-w-sm text-sm text-ink-soft">{article.dek}</p>
-                  </div>
-                </Link>
-              </StoryReveal>
-            ))}
-          </div>
+      <section data-frame className="frame bg-paper px-6 lg:px-12">
+        <div className="frame-inner grid grid-cols-1 gap-x-12 gap-y-[min(3svh,1.5rem)] sm:grid-cols-2">
+          {features.map((article, i) => (
+            <StoryReveal key={article.slug} delay={i * 80}>
+              <Link to={`/insights/${article.slug}`} className="group block">
+                <div className="h-[13svh] sm:h-[clamp(80px,calc(var(--frame-h)-11rem),380px)]">
+                  <EditorialImage tone={article.tone} ratio="aspect-auto" className="h-full" />
+                </div>
+                <div className="mt-[min(2svh,1.25rem)]">
+                  <EditorialLabel>{article.kicker}</EditorialLabel>
+                  <h2 className="frame-heading mt-2 font-display font-bold text-ink transition-colors group-hover:text-gold">
+                    {article.title}
+                  </h2>
+                  <p className="frame-text mt-2 max-w-sm text-ink-soft">{article.dek}</p>
+                </div>
+              </Link>
+            </StoryReveal>
+          ))}
         </div>
       </section>
 
       {/* Briefs — short-form, editorial list */}
-      <section className="relative bg-ivory px-6 py-20 lg:px-12 lg:py-28">
-        <div className="mx-auto max-w-[1440px]">
+      <section data-frame className="frame bg-ivory px-6 lg:px-12">
+        <div className="frame-inner">
           <StoryReveal>
             <EditorialLabel>IN BRIEF</EditorialLabel>
           </StoryReveal>
-          <ol className="mt-8 divide-y divide-ink/10 border-y border-ink/10">
+          <ol className="mt-[min(3svh,2rem)] divide-y divide-ink/10 border-y border-ink/10">
             {briefs.map((article, i) => (
               <li key={article.slug}>
                 <StoryReveal delay={i * 60}>
                   <Link
                     to={`/insights/${article.slug}`}
-                    className="group flex flex-col gap-2 py-8 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
+                    className="group flex flex-col gap-2 py-[min(3.5svh,2.5rem)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-8"
                   >
                     <div>
                       <EditorialLabel>{article.kicker}</EditorialLabel>
-                      <h3 className="mt-2 font-display text-xl font-bold text-ink transition-colors group-hover:text-gold sm:text-2xl">
+                      <h3
+                        className="frame-title mt-2 font-display font-bold tracking-tight text-ink transition-colors group-hover:text-gold"
+                        style={{ "--chars": 24 } as CSSProperties}
+                      >
                         {article.title}
                       </h3>
                     </div>

@@ -89,7 +89,20 @@ export default function BreakSilos() {
   const frameRefs = useRef<(HTMLDivElement | null)[]>([]);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const threadRef = useRef<SVGPathElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const reducedMotion = useReducedMotion();
+
+  // Play the background video only while the section is on screen.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || reducedMotion || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) void video.play().catch(() => {});
+      else video.pause();
+    }, { threshold: 0.25 });
+    io.observe(video);
+    return () => io.disconnect();
+  }, [reducedMotion]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -151,8 +164,32 @@ export default function BreakSilos() {
     <section
       id="insights"
       ref={sectionRef}
-      className="relative flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 pb-6 pt-[var(--nav-h)] text-ivory"
+      className="relative isolate flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 pb-6 pt-[var(--nav-h)] text-ivory"
     >
+      {/* Experiment: video behind the section, under a navy tint so the
+          ivory type and line drawings stay legible. The clip is a portrait
+          shot, so it's shown whole (not cropped) against the left edge — the
+          pencils stay in frame — and the element's own background is the
+          paper's blue, which carries the frame on across the rest of the
+          screen. It only plays while the section is on screen. */}
+      <video
+        ref={videoRef}
+        className="pointer-events-none absolute inset-0 -z-20 h-full w-full bg-[#14b5fd] object-contain object-left"
+        src="/assets/silos-bg.mp4"
+        poster="/assets/silos-bg-poster.jpg"
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      />
+      {/* feathers the right edge of the (portrait) frame into the flat blue beside it */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[min(100%,56.25svh)] bg-[linear-gradient(90deg,transparent_70%,#14b5fd_100%)]"
+      />
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 bg-navy/60" />
+
       <div className="mx-auto max-w-2xl text-center">
         <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">NOT CHANNELS.</p>
         <h2 className="mt-3 font-display text-3xl font-extrabold uppercase leading-tight tracking-tight short:text-2xl sm:text-5xl">

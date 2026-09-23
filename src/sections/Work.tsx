@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { workItems } from "../data/content";
 import { SliderButton, useSliderTrack } from "../components/SliderControls";
 
+// Fallback plates, visible only until (or if) a card's image loads.
 const PANEL_STYLES = [
   "linear-gradient(150deg,#262970 0%,#1a1c4a 100%)",
   "linear-gradient(150deg,#9f732c 0%,#4a3a1f 100%)",
@@ -35,27 +37,38 @@ export default function Work() {
           className="flex gap-6 overflow-x-auto px-6 pb-2 [scrollbar-width:none] lg:px-12 [&::-webkit-scrollbar]:hidden"
         >
           {workItems.map((item, i) => (
-            <button
+            <div
               key={item.id}
               data-slide
+              role="button"
+              tabIndex={0}
               onClick={() => setActiveIndex((cur) => (cur === i ? null : i))}
-              className="group relative work-card w-[82vw] max-w-[420px] shrink-0 overflow-hidden rounded-2xl text-left shadow-[0_30px_60px_-30px_rgba(62,62,62,0.4)] sm:w-[380px] lg:w-[420px]"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setActiveIndex((cur) => (cur === i ? null : i));
+                }
+              }}
+              className="group relative work-card w-[82vw] max-w-[420px] shrink-0 cursor-pointer overflow-hidden rounded-2xl text-left shadow-[0_30px_60px_-30px_rgba(62,62,62,0.4)] sm:w-[380px] lg:w-[420px]"
               style={{ background: PANEL_STYLES[i % PANEL_STYLES.length] }}
             >
-              <span
-                className={`absolute right-6 top-6 font-display text-6xl font-extrabold opacity-30 ${
-                  i === 2 ? "text-ink" : "text-ivory"
-                }`}
-              >
+              <img
+                src={item.image}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              {/* Navy fade: keeps the title and chips legible over any photo. */}
+              <div className="absolute inset-0 bg-gradient-to-t from-navy/95 via-navy/40 via-45% to-transparent" />
+
+              <span className="absolute right-6 top-6 font-display text-6xl font-extrabold text-ivory opacity-40">
                 {String(i + 1).padStart(2, "0")}
               </span>
 
               <div className="absolute inset-x-0 bottom-0 p-7">
-                <h3
-                  className={`font-display text-xl font-bold leading-snug sm:text-2xl ${
-                    i === 2 ? "text-ink" : "text-ivory"
-                  }`}
-                >
+                <h3 className="font-display text-xl font-bold leading-snug text-ivory sm:text-2xl">
                   {item.title}
                 </h3>
 
@@ -65,32 +78,28 @@ export default function Work() {
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className={`text-sm ${i === 2 ? "text-ink-soft" : "text-ivory/70"}`}>{item.teaser}</p>
+                    <p className="text-sm text-ivory/70">{item.teaser}</p>
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {item.mediums.map((m) => (
                         <span
                           key={m}
-                          className={`rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide-label ${
-                            i === 2
-                              ? "border-ink/20 text-ink-soft"
-                              : "border-ivory/25 text-ivory/80"
-                          }`}
+                          className="rounded-full border border-ivory/25 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wide-label text-ivory/80"
                         >
                           {m}
                         </span>
                       ))}
                     </div>
-                    <span
-                      className={`mt-4 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide-label ${
-                        i === 2 ? "text-gold" : "text-gold-pale"
-                      }`}
+                    <Link
+                      to={`/work/${item.id.replace("work-", "story-")}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="relative z-10 mt-4 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide-label text-gold-pale underline-offset-4 hover:underline"
                     >
                       View the story <span aria-hidden="true">&rarr;</span>
-                    </span>
+                    </Link>
                   </div>
                 </div>
               </div>
-            </button>
+            </div>
           ))}
 
           <div className="work-card flex w-[60vw] max-w-[260px] shrink-0 items-center justify-center">

@@ -34,10 +34,14 @@
    start their content below it so nothing sits underneath. */
 :root {
   --nav-h: 4.5rem;
+  /* Side padding of the navbar and of every frame — kept in one place so
+     their left edges line up. */
+  --page-px: 1.5rem;
 }
 @media (min-width: 1024px) {
   :root {
     --nav-h: 5rem;
+    --page-px: 3rem;
   }
 }
 
@@ -92,6 +96,151 @@ button {
   letter-spacing: 0.22em;
 }
 
+/* ---- Shared frame ---------------------------------------------------------
+   Every section of every page is one "frame": exactly one screen tall, its
+   content centered below the fixed navbar, and the section navigator slides
+   from one frame to the next (mark a section with `data-frame`). Anything
+   that overflows is clipped, so inner sizing must come from `--frame-h` (the
+   room a frame's content really has) or from svh/vw — never fixed rem values
+   that can outgrow a short screen. In development, frameGuard.ts warns when
+   a frame's content doesn't fit.
+   Kept in the components layer so ordinary utilities (px-*, bg-*, justify-*)
+   still override it. */
+@layer components {
+  .frame {
+    --frame-pb: 1.5rem;
+    --frame-h: calc(100svh - var(--nav-h) - var(--frame-pb));
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100svh;
+    padding-top: var(--nav-h);
+    padding-bottom: var(--frame-pb);
+    overflow: hidden;
+  }
+  /* Room for the fixed bottom-left page indicator, which only shows here. */
+  @media (min-width: 1024px) and (min-height: 600px) {
+    .frame {
+      --frame-pb: 3rem;
+    }
+  }
+  /* Same content width as the navbar (max-w 1440 *including* its padding),
+     so headings start exactly under the logo on any screen width. */
+  .frame-inner {
+    width: 100%;
+    max-width: calc(1440px - 2 * var(--page-px));
+    margin-inline: auto;
+  }
+
+  /* Fluid type for frames. Each size is the smallest of a comfortable cap, a
+     share of the viewport height, and (for headlines) what fits the width —
+     `--chars` is the longest line's character count. */
+  .frame-display {
+    font-size: clamp(
+      1.5rem,
+      min(calc((100vw - 3rem) / (var(--chars, 12) * 0.68)), 9.5svh, 6.5rem),
+      6.5rem
+    );
+    line-height: 0.98;
+  }
+  .frame-title {
+    font-size: clamp(
+      1.35rem,
+      min(calc((100vw - 3rem) / (var(--chars, 14) * 0.68)), 6.4svh, 3.25rem),
+      3.25rem
+    );
+    line-height: 1.04;
+  }
+  .frame-heading {
+    font-size: clamp(1.05rem, min(5vw, 3.8svh), 1.75rem);
+    line-height: 1.2;
+  }
+  .frame-text {
+    font-size: clamp(0.8125rem, min(3.6vw, 2svh), 1rem);
+  }
+  @media (max-height: 500px) and (orientation: landscape) {
+    .frame-display {
+      font-size: clamp(1.25rem, min(calc((100vw - 3rem) / (var(--chars, 12) * 0.68)), 12svh), 3rem);
+    }
+    .frame-title {
+      font-size: clamp(1.1rem, min(calc((100vw - 3rem) / (var(--chars, 14) * 0.68)), 9svh), 2rem);
+    }
+    .frame-heading {
+      font-size: clamp(0.95rem, 6.5svh, 1.35rem);
+    }
+    .frame-text {
+      font-size: clamp(0.72rem, 4.6svh, 0.875rem);
+    }
+  }
+
+  /* Approach statements: one line each, as large as the width and the height
+     (five of them share the frame) allow. */
+  .frame-statement {
+    font-size: clamp(1.05rem, min(calc((100vw - 5.5rem) / 15), 5.4svh, 3.75rem), 3.75rem);
+    line-height: 1.05;
+  }
+  /* Approach transformation steps: a single column on phones, three across from sm. */
+  .frame-step {
+    font-size: clamp(1.2rem, min(calc((100vw - 3rem) / 11), 4.6svh), 3rem);
+    line-height: 1;
+  }
+  @media (min-width: 640px) {
+    .frame-step {
+      font-size: clamp(1.2rem, min(calc(((100vw - 3rem - 4rem) / 3) / 6.4), 7svh), 3.75rem);
+    }
+  }
+
+  /* Approach "flow": seven rows that always share the room they're given. */
+  .flow-list {
+    --row: clamp(2rem, calc((100svh - var(--nav-h) - 18rem) / 7), 4.5rem);
+  }
+  @media (min-width: 768px) {
+    .flow-list {
+      --row: clamp(2rem, calc((100svh - var(--nav-h) - 8rem) / 7), 4.75rem);
+    }
+  }
+  @media (max-height: 500px) and (orientation: landscape) {
+    .flow-list {
+      --row: clamp(1.75rem, calc((100svh - var(--nav-h) - 3rem) / 7), 3rem);
+    }
+  }
+  .flow-row {
+    height: var(--row);
+  }
+  .flow-dot {
+    width: calc(var(--row) * 0.62);
+    height: calc(var(--row) * 0.62);
+    font-size: clamp(0.6rem, calc(var(--row) * 0.22), 0.75rem);
+  }
+  .flow-label {
+    font-size: clamp(1rem, calc(var(--row) * 0.42), 1.75rem);
+  }
+
+  /* Amplification slider cards: square, sized from what the frame leaves. */
+  .slide-card {
+    --card: clamp(120px, calc(var(--frame-h) - 15rem), 260px);
+    width: var(--card);
+    height: var(--card);
+  }
+  @media (max-height: 500px) and (orientation: landscape) {
+    .slide-card {
+      --card: clamp(110px, calc(var(--frame-h) - 3rem), 220px);
+    }
+  }
+}
+
+/* Pull-quote size inside a frame. Deliberately outside the components layer:
+   PullQuote sets its own text-2xl / sm:text-3xl, and this has to beat them. */
+.frame-quote {
+  font-size: clamp(1.05rem, min(5.4vw, 3.6svh), 2rem);
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  .frame-quote {
+    font-size: clamp(0.95rem, 6.5svh, 1.35rem);
+  }
+}
+
 /* ---- Fit-to-viewport sizing --------------------------------------------
    The homepage's sections are single "frames": each must be fully visible
    in one screen at any window size. Anything whose natural size would
@@ -105,12 +254,55 @@ button {
 }
 @media (min-width: 1024px) {
   .hero-headline {
-    font-size: min(4.5rem, calc((100vw - 9rem) / 19), calc((100svh - 18rem) / 3.8));
+    font-size: min(5.5rem, calc((100vw - 6rem) / 14), calc((100svh - 16rem) / 3.4));
   }
 }
 @media (max-height: 500px) and (orientation: landscape) {
   .hero-headline {
     font-size: min(2rem, 8svh, 5vw);
+  }
+}
+
+/* Hero video: the clip is portrait. Upright screens fill with it as-is; on
+   landscape screens it is turned 90deg (a top-down desk has no "up"), so the
+   whole scene covers the frame edge to edge instead of a thin cropped slice.
+   The frame is a size container so the turned video can be sized from it. */
+.hero-video-frame {
+  container-type: size;
+  overflow: hidden;
+}
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (orientation: landscape) {
+  .hero-video {
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: 100cqh;
+    height: 100cqw;
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+}
+
+/* Ivory wash over the video: keeps the navy headline legible. Heavier on the
+   copy side (left) when landscape, lighter over the right. */
+.hero-wash {
+  background: linear-gradient(180deg, rgba(244, 241, 234, 0.9) 0%, rgba(244, 241, 234, 0.78) 100%);
+}
+@media (orientation: landscape) {
+  .hero-wash {
+    background: linear-gradient(
+      90deg,
+      rgba(244, 241, 234, 0.92) 0%,
+      rgba(244, 241, 234, 0.8) 40%,
+      rgba(244, 241, 234, 0.3) 75%,
+      rgba(244, 241, 234, 0.15) 100%
+    );
   }
 }
 
@@ -171,4 +363,14 @@ button {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Applied only while frameGuard measures — see lib/frameGuard.ts. */
+.frame-audit [data-frame],
+.frame-audit [data-frame] * {
+  transform: none !important;
+  translate: none !important;
+  scale: none !important;
+  rotate: none !important;
+  transition: none !important;
 }

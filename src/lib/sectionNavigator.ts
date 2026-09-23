@@ -52,7 +52,10 @@ const WHEEL_ARM_THRESHOLD = 4;
 const SETTLE_DURATION = 0.7;
 const KEY_NUDGE_RATIO = 0.85;
 
-const INTERACTIVE_SELECTOR = "input, textarea, select, button, a[href], [contenteditable], [role='button']";
+// Elements that own the arrow / page keys (typing, picking an option).
+const TEXT_ENTRY_SELECTOR = "input, textarea, select, [contenteditable]";
+// Elements that also own Space (it activates them).
+const INTERACTIVE_SELECTOR = `${TEXT_ENTRY_SELECTOR}, button, a[href], [role='button']`;
 
 export class SectionNavigator {
   private frames: Frame[] = [];
@@ -71,7 +74,18 @@ export class SectionNavigator {
 
   private snapshotListeners = new Set<(snapshot: NavigatorSnapshot) => void>();
 
-  constructor(private readonly ids: string[]) {}
+  private ids: string[];
+  private readonly auto: boolean;
+
+  /**
+   * `ids` names the frames explicitly (the homepage). With `null`, every
+   * `[data-frame]` element inside <main> is a frame, in document order — how
+   * the inner pages opt in without keeping a list in sync.
+   */
+  constructor(ids: string[] | null = null) {
+    this.auto = ids === null;
+    this.ids = ids ?? [];
+  }
 
   start() {
     const unsubReady = onLenisReady((lenis) => {
@@ -80,7 +94,10 @@ export class SectionNavigator {
       this.measure();
       if (this.frames.length === 0) return;
       this.attachInput(lenis);
-      this.settleImmediately(this.frames[0]);
+      // Usually the page opens at the top, but a reload (or dev hot-reload)
+      // can leave the browser scrolled part-way down — start from whichever
+      // frame is actually on screen instead of assuming the first.
+      this.settleImmediately(this.frames[Math.max(0, this.frameAtViewportCenter())]);
     });
     this.unsubscribers.push(unsubReady);
 
@@ -115,13 +132,23 @@ export class SectionNavigator {
   // ---- setup -------------------------------------------------------------
 
   private measure() {
-    this.frames = this.ids
-      .map((id) => document.getElementById(id))
+    let candidates: Array<{ id: string; element: HTMLElement | null }>;
+    if (this.auto) {
+      candidates = Array.from(document.querySelectorAll<HTMLElement>("main [data-frame]")).map((element, i) => ({
+        id: element.id || `frame-${i}`,
+        element,
+      }));
+      this.ids = candidates.map((c) => c.id);
+    } else {
+      candidates = this.ids.map((id) => ({ id, element: document.getElementById(id) }));
+    }
+
+    this.frames = candidates
       // A section that's been dismissed (or hidden for any other reason)
       // has no box — it isn't a frame anymore.
-      .filter((el): el is HTMLElement => Boolean(el) && el!.getBoundingClientRect().height > 0)
-      .map((element, index) => ({
-        id: element.id,
+      .filter((c): c is { id: string; element: HTMLElement } => Boolean(c.element) && c.element!.getBoundingClientRect().height > 0)
+      .map(({ id, element }, index) => ({
+        id,
         index,
         element,
         kind: this.classify(element),
@@ -146,10 +173,45 @@ export class SectionNavigator {
 
   private onLoad = () => this.remeasureKinds();
 
-  /** Page always opens at the top (see RouteEffects) — resolve the resting frame without any scroll motion. */
+  /** Index of the frame covering the middle of the viewport, or -1 (e.g. over the footer). */
+  private frameAtViewportCenter() {
+    const mid = window.innerHeight / 2;
+    return this.frames.findIndex((f) => {
+      const rect = f.element.getBoundingClientRect();
+      return rect.top <= mid && rect.bottom > mid;
+    });
+  }
+
+  /**
+   * Re-anchors the bookkeeping to what's actually on screen. The page can
+   * end up somewhere the navigator didn't put it (scrollbar drag, restored
+   * scroll position, layout shifting under it); without this, "previous" and
+   * "next" would be relative to a frame the visitor isn't looking at.
+   */
+  private syncToViewport() {
+    const index = this.frameAtViewportCenter();
+    if (index !== -1 && index !== this.currentIndex) {
+      this.currentIndex = index;
+      this.emitSnapshot();
+    }
+  }
+
+  /** Resolves the resting frame without any scroll motion. */
   private settleImmediately(frame: Frame) {
     this.currentIndex = frame.index;
+    this.alignToFrame(frame);
     this.afterSettle(frame);
+  }
+
+  /**
+   * A "fit" frame is meant to sit exactly on screen. If the page was left
+   * between frames (a navigator restart mid-transition, a scrollbar drag),
+   * snap it into place so there's a clean frame to scroll up or down from.
+   */
+  private alignToFrame(frame: Frame) {
+    if (frame.kind !== "fit") return;
+    if (Math.abs(frame.element.getBoundingClientRect().top) <= EXIT_EPSILON) return;
+    this.lenis?.scrollTo(frame.element, { immediate: true, force: true });
   }
 
   // ---- input ---------------------------------------------------------------
@@ -188,7 +250,11 @@ export class SectionNavigator {
   };
 
   private onKeydown = (e: KeyboardEvent) => {
-    if (this.isInteractiveTarget(e.target)) return;
+    // After a click, focus stays on the button or link that was pressed. Space
+    // must still activate it, but the arrow / page keys have no job there —
+    // and if the navigator ignored them the browser would scroll the page
+    // natively and leave the frame off its mark.
+    if (this.isInteractiveTarget(e.target, e.key === " ")) return;
 
     let direction: Direction | null = null;
     if (e.key === "ArrowDown" || e.key === "PageDown" || (e.key === " " && !e.shiftKey)) direction = "forward";
@@ -204,8 +270,10 @@ export class SectionNavigator {
     this.navigate(direction);
   };
 
-  private isInteractiveTarget(target: EventTarget | null) {
-    return target instanceof HTMLElement && Boolean(target.closest(INTERACTIVE_SELECTOR));
+  private isInteractiveTarget(target: EventTarget | null, isSpace: boolean) {
+    return (
+      target instanceof HTMLElement && Boolean(target.closest(isSpace ? INTERACTIVE_SELECTOR : TEXT_ENTRY_SELECTOR))
+    );
   }
 
   private nudge(direction: Direction) {
@@ -219,8 +287,17 @@ export class SectionNavigator {
 
   private navigate(direction: Direction) {
     if (this.state !== "ready") return;
+    this.syncToViewport();
     const targetIndex = this.currentIndex + (direction === "forward" ? 1 : -1);
-    if (targetIndex < 0) return;
+    if (targetIndex < 0) {
+      // Nothing above the first frame — but if the page has drifted off it,
+      // bring it back rather than appearing to ignore the gesture.
+      const first = this.frames[this.currentIndex];
+      if (first && first.kind === "fit" && Math.abs(first.element.getBoundingClientRect().top) > EXIT_EPSILON) {
+        this.enterFrame(this.currentIndex, direction);
+      }
+      return;
+    }
     if (targetIndex >= this.frames.length) {
       // Nothing past the last frame but the page's own trailing content
       // (the footer) — release Lenis so it's reachable by ordinary
@@ -242,10 +319,22 @@ export class SectionNavigator {
    */
   goToId(id: string) {
     if (this.state !== "ready") return;
+    this.syncToViewport();
     // A dismissed interstitial resolves to whichever frame took its place.
     const wanted = this.ids.indexOf(id);
     const targetIndex = wanted === -1 ? -1 : this.frames.findIndex((f) => this.ids.indexOf(f.id) >= wanted);
-    if (targetIndex === -1 || targetIndex === this.currentIndex) return;
+    this.goToFrame(targetIndex);
+  }
+
+  /** Same as `goToId`, addressing the frame by position (progress dots). */
+  goToIndex(index: number) {
+    if (this.state !== "ready") return;
+    this.syncToViewport();
+    this.goToFrame(index);
+  }
+
+  private goToFrame(targetIndex: number) {
+    if (targetIndex < 0 || targetIndex >= this.frames.length || targetIndex === this.currentIndex) return;
     const direction: Direction = targetIndex > this.currentIndex ? "forward" : "backward";
     this.leavePassthrough();
     this.lenis?.stop();
@@ -445,21 +534,57 @@ export class SectionNavigator {
   }
 }
 
-// Only one Home page (and therefore one navigator) is ever mounted at a
-// time. Exposing it as a singleton lets existing click-driven affordances
-// elsewhere (the navbar logo, Hero's "scroll to next" button) hand off to
-// it instead of scrolling straight through Lenis, which would desync the
-// navigator's frame bookkeeping — or simply get swallowed while a section
-// is locked/mid-cinematic.
+// Only one page (and therefore one navigator) is ever mounted at a time.
+// Exposing it as a singleton lets existing click-driven affordances
+// elsewhere (the navbar logo, Hero's "scroll to next" button, the frame
+// progress dots) hand off to it instead of scrolling straight through
+// Lenis, which would desync the navigator's frame bookkeeping — or simply
+// get swallowed while a section is locked/mid-cinematic.
 let activeNavigator: SectionNavigator | null = null;
+let activeUnsubscribe: (() => void) | null = null;
+let latestSnapshot: NavigatorSnapshot | null = null;
+const storeListeners = new Set<() => void>();
+
+function notifyStore() {
+  storeListeners.forEach((fn) => fn());
+}
 
 export function setActiveSectionNavigator(navigator: SectionNavigator | null) {
+  activeUnsubscribe?.();
+  activeUnsubscribe = null;
   activeNavigator = navigator;
+  latestSnapshot = null;
+  if (navigator) {
+    activeUnsubscribe = navigator.subscribe((snapshot) => {
+      latestSnapshot = snapshot;
+      notifyStore();
+    });
+  } else {
+    notifyStore();
+  }
+}
+
+/** External-store plumbing for `useSyncExternalStore` (see useFrameSnapshot). */
+export function subscribeToActiveNavigator(fn: () => void) {
+  storeListeners.add(fn);
+  return () => {
+    storeListeners.delete(fn);
+  };
+}
+
+export function getActiveNavigatorSnapshot() {
+  return latestSnapshot;
 }
 
 /** Returns true if an active navigator handled (or is handling) the request. */
 export function requestSectionById(id: string): boolean {
   if (!activeNavigator) return false;
   activeNavigator.goToId(id);
+  return true;
+}
+
+export function requestFrameIndex(index: number): boolean {
+  if (!activeNavigator) return false;
+  activeNavigator.goToIndex(index);
   return true;
 }

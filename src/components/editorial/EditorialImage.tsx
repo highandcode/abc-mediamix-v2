@@ -20,12 +20,15 @@ export default function EditorialImage({
   ratio = "aspect-[4/5]",
   className,
   caption,
+  src,
   children,
 }: {
   tone?: number;
   ratio?: string;
   className?: string;
   caption?: string;
+  /** A real image; when set it covers the gradient plate (which stays as its fallback). */
+  src?: string;
   children?: ReactNode;
 }) {
   const light = tone === 2;
@@ -35,8 +38,17 @@ export default function EditorialImage({
         className={clsx("relative h-full w-full overflow-hidden border border-ink/10", ratio)}
         style={{ background: TONES[tone % TONES.length] }}
       >
+        {src && (
+          <img
+            src={src}
+            alt=""
+            decoding="async"
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
         <svg
-          className="absolute inset-0 h-full w-full opacity-[0.18]"
+          className={clsx("absolute inset-0 h-full w-full opacity-[0.18]", src && "hidden")}
           viewBox="0 0 400 500"
           preserveAspectRatio="none"
           fill="none"

@@ -14,6 +14,7 @@ export type CaseStudy = {
   coverKicker: string;
   coverHeading: string[];
   mediums: string[];
+  image: string;
   tone: number;
   stages: {
     brief: CaseStage;
@@ -152,6 +153,7 @@ export const caseStudies: CaseStudy[] = workItems.map((item, i) => ({
   coverKicker: `ABC / ${String(i + 1).padStart(2, "0")}`,
   coverHeading: COVER_HEADINGS[item.id] ?? [item.title.toUpperCase()],
   mediums: item.mediums,
+  image: item.image,
   tone: i % 5,
   stages: STAGES[item.id],
 }));

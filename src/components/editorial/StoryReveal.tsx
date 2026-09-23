@@ -29,7 +29,11 @@ export default function StoryReveal({
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -8% 0px" }
+      // Any overlap counts. Content parked at the very bottom of a one-screen
+      // frame starts 24px lower than its resting place, so a stricter zone
+      // (a threshold, or a negative bottom margin) would put it out of reach
+      // and it would never appear.
+      { threshold: 0, rootMargin: "0px 0px 4% 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();

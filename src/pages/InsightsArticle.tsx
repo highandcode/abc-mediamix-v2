@@ -1,91 +1,77 @@
+import type { CSSProperties } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { articles, getArticle, issue } from "../data/insights";
+import { chunkArticle, type ArticleBlock } from "../lib/chunkArticle";
 import PageTransition from "../components/editorial/PageTransition";
-import PageProgress from "../components/editorial/PageProgress";
 import PageIndicator from "../components/editorial/PageIndicator";
 import EditorialLabel from "../components/editorial/EditorialLabel";
 import EditorialImage from "../components/editorial/EditorialImage";
 import PullQuote from "../components/editorial/PullQuote";
 import StoryReveal from "../components/editorial/StoryReveal";
-import GoldThread from "../components/editorial/GoldThread";
 
+// Every section below is one frame (`data-frame`): one screen tall, and the
+// section navigator slides between them. The body is split into frames by
+// `chunkArticle`, with the second image between the halves.
 export default function InsightsArticle() {
   const { slug = "" } = useParams();
   const article = getArticle(slug);
 
   if (!article) return <Navigate to="/insights" replace />;
 
-  const midpoint = Math.ceil(article.body.length / 2);
-  const before = article.body.slice(0, midpoint);
-  const after = article.body.slice(midpoint);
+  const chunks = chunkArticle(article.body);
+  const imageAfter = chunks.length > 1 ? Math.ceil(chunks.length / 2) : -1;
   const next = articles[(articles.findIndex((a) => a.slug === article.slug) + 1) % articles.length];
 
   return (
     <PageTransition>
-      <PageProgress />
       <PageIndicator label={`ABC / ${article.kicker}`} />
 
       <article>
-        <section className="relative bg-ivory px-6 pb-14 pt-32 lg:px-12 lg:pt-44">
-          <div className="mx-auto max-w-3xl">
-            <StoryReveal>
-              <div className="flex items-center gap-4 text-[11px] font-medium tracking-wide-label text-ink-soft/70">
-                <span>{issue.name}</span>
-                <span className="h-3 w-px bg-ink/20" />
-                <span>{article.kicker}</span>
+        <section data-frame className="frame bg-ivory px-6 lg:px-12">
+          <div className="frame-inner grid grid-cols-1 gap-[min(3svh,1.5rem)] md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-12 short:grid-cols-[1.1fr_0.9fr] short:items-center short:gap-8">
+            <div>
+              <StoryReveal>
+                <div className="flex items-center gap-4 text-[11px] font-medium tracking-wide-label text-ink-soft/70">
+                  <span>{issue.name}</span>
+                  <span className="h-3 w-px bg-ink/20" />
+                  <span>{article.kicker}</span>
+                </div>
+              </StoryReveal>
+              <StoryReveal delay={90}>
+                <h1
+                  className="frame-title mt-[min(2.4svh,1.25rem)] font-display font-extrabold uppercase tracking-tight text-ink"
+                  style={{ "--chars": 13 } as CSSProperties}
+                >
+                  {article.title}
+                </h1>
+              </StoryReveal>
+              <StoryReveal delay={170}>
+                <p className="frame-text mt-[min(2.4svh,1.5rem)] max-w-md font-serif italic text-ink-soft">
+                  {article.dek}
+                </p>
+              </StoryReveal>
+            </div>
+            <StoryReveal delay={120}>
+              <div className="h-[18svh] md:h-[min(calc(100svh-var(--nav-h)-5rem),30rem)] short:h-[calc(100svh-var(--nav-h)-3rem)]">
+                <EditorialImage tone={article.tone} ratio="aspect-auto" className="h-full" />
               </div>
             </StoryReveal>
-            <StoryReveal delay={90}>
-              <h1 className="mt-5 font-display text-4xl font-extrabold uppercase leading-[0.98] tracking-tight text-ink sm:text-6xl">
-                {article.title}
-              </h1>
-            </StoryReveal>
-            <StoryReveal delay={170}>
-              <p className="mt-6 font-serif text-xl italic text-ink-soft sm:text-2xl">{article.dek}</p>
-            </StoryReveal>
           </div>
         </section>
 
-        <StoryReveal className="mx-auto max-w-5xl px-6 lg:px-12">
-          <EditorialImage tone={article.tone} ratio="aspect-[16/9]" caption="ABC EDIT — editorial illustration" />
-        </StoryReveal>
-
-        <section className="relative bg-ivory px-6 py-16 lg:px-12">
-          <div className="relative mx-auto max-w-3xl">
-            <GoldThread className="absolute -left-10 top-0 hidden h-full lg:block" />
-            <div className="flex flex-col gap-7">
-              {before.map((block, i) => (
-                <StoryReveal key={i} delay={i * 40}>
-                  <ArticleBlock block={block} />
-                </StoryReveal>
-              ))}
-            </div>
-
-            {after.length > 0 && (
-              <>
-                <StoryReveal className="my-10">
-                  <EditorialImage tone={(article.tone + 2) % 5} ratio="aspect-[16/9]" />
-                </StoryReveal>
-                <div className="flex flex-col gap-7">
-                  {after.map((block, i) => (
-                    <StoryReveal key={i} delay={i * 40}>
-                      <ArticleBlock block={block} />
-                    </StoryReveal>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+        {chunks.map((blocks, i) => (
+          <ArticleFrames key={i} blocks={blocks} imageTone={i + 1 === imageAfter ? (article.tone + 2) % 5 : null} />
+        ))}
       </article>
 
-      <section className="relative border-t border-ink/10 bg-paper px-6 py-16 lg:px-12">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
+      <section data-frame className="frame items-center border-t border-ink/10 bg-paper px-6 lg:px-12">
+        <div className="frame-inner flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
           <div>
             <EditorialLabel>NEXT IN THE EDIT</EditorialLabel>
             <Link
               to={`/insights/${next.slug}`}
-              className="mt-2 block font-display text-2xl font-bold text-ink transition-colors hover:text-gold sm:text-3xl"
+              className="frame-title mt-2 block max-w-2xl font-display font-bold text-ink transition-colors hover:text-gold"
+              style={{ "--chars": 24 } as CSSProperties}
             >
               {next.title}
             </Link>
@@ -102,14 +88,42 @@ export default function InsightsArticle() {
   );
 }
 
-function ArticleBlock({ block }: { block: { heading?: string; text?: string; quote?: string } }) {
-  if (block.quote) return <PullQuote>{block.quote}</PullQuote>;
+/** One frame of body copy, followed by an image-only frame when `imageTone` is set. */
+function ArticleFrames({ blocks, imageTone }: { blocks: ArticleBlock[]; imageTone: number | null }) {
+  return (
+    <>
+      <section data-frame className="frame bg-ivory px-6 lg:px-12">
+        <div className="frame-inner">
+          <div className="mx-auto flex max-w-3xl flex-col gap-[min(3.5svh,1.75rem)] border-l border-gold/40 pl-5 sm:pl-8 short:max-w-none short:grid short:grid-cols-2 short:gap-8">
+            {blocks.map((block, i) => (
+              <StoryReveal key={i} delay={i * 80}>
+                <ArticleBlockView block={block} />
+              </StoryReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+      {imageTone !== null && (
+        <section data-frame className="frame bg-ivory px-6 lg:px-12">
+          <div className="frame-inner">
+            <StoryReveal>
+              <div className="mx-auto h-[min(calc(100svh-var(--nav-h)-5rem),34rem)] max-w-5xl">
+                <EditorialImage tone={imageTone} ratio="aspect-auto" className="h-full" />
+              </div>
+            </StoryReveal>
+          </div>
+        </section>
+      )}
+    </>
+  );
+}
+
+function ArticleBlockView({ block }: { block: ArticleBlock }) {
+  if (block.quote) return <PullQuote className="frame-quote">{block.quote}</PullQuote>;
   return (
     <div>
-      {block.heading && (
-        <h2 className="mb-3 font-display text-xl font-bold text-ink sm:text-2xl">{block.heading}</h2>
-      )}
-      {block.text && <p className="text-base leading-relaxed text-ink-soft">{block.text}</p>}
+      {block.heading && <h2 className="frame-heading mb-2 font-display font-bold text-ink">{block.heading}</h2>}
+      {block.text && <p className="frame-text leading-relaxed text-ink-soft">{block.text}</p>}
     </div>
   );
 }
