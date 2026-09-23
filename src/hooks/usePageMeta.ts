@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { caseStudies } from "../data/work";
+import { campaigns } from "../data/campaigns";
 import { articles } from "../data/insights";
 import { getRouteMeta, getMetaTagSpecs } from "../lib/seo";
 
@@ -17,7 +17,7 @@ export function usePageMeta() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const meta = getRouteMeta(pathname, { caseStudies, articles });
+    const meta = getRouteMeta(pathname, { campaigns, articles });
 
     document.title = meta.title;
     document.head.querySelectorAll(`[${SEO_MARKER}]`).forEach((el) => el.remove());

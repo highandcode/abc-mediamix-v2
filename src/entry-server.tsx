@@ -2,11 +2,11 @@ import React from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import App from "./App";
-import { caseStudies } from "./data/work";
+import { campaigns } from "./data/campaigns";
 import { articles } from "./data/insights";
 import { getRouteMeta, buildHeadHtml } from "./lib/seo";
 
-export { caseStudies, articles };
+export { campaigns, articles };
 
 export function render(url: string) {
   const appHtml = renderToString(
@@ -17,7 +17,7 @@ export function render(url: string) {
     </React.StrictMode>
   );
 
-  const meta = getRouteMeta(url, { caseStudies, articles });
+  const meta = getRouteMeta(url, { campaigns, articles });
   const headHtml = buildHeadHtml(meta);
 
   return { appHtml, headHtml };

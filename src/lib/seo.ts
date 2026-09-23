@@ -1,4 +1,4 @@
-import type { CaseStudy } from "../data/work";
+import type { Campaign } from "../data/campaigns";
 import type { Article } from "../data/insights";
 import { issue } from "../data/insights";
 
@@ -138,20 +138,20 @@ const NOT_FOUND_META: PageMeta = {
   jsonLd: [],
 };
 
-export function getWorkMeta(study: CaseStudy): PageMeta {
-  const path = `/work/${study.slug}`;
-  const title = `${study.title} | ABC Mediamix`;
+export function getWorkMeta(campaign: Campaign): PageMeta {
+  const path = `/work/${campaign.slug}`;
+  const title = `${campaign.client} | ABC Mediamix`;
   return {
     path,
     title,
-    description: study.teaser,
+    description: campaign.teaser,
     ogType: "article",
     jsonLd: [
-      webPageJsonLd(path, title, study.teaser),
+      webPageJsonLd(path, title, campaign.teaser),
       breadcrumbJsonLd([
         { name: "ABC Mediamix", path: "/" },
         { name: "Work", path: "/work" },
-        { name: study.title, path },
+        { name: campaign.client, path },
       ]),
     ],
   };
@@ -193,7 +193,7 @@ export function getInsightMeta(article: Article): PageMeta {
 
 export function getRouteMeta(
   pathname: string,
-  data: { caseStudies: CaseStudy[]; articles: Article[] }
+  data: { campaigns: Campaign[]; articles: Article[] }
 ): PageMeta {
   const path = pathname === "" ? "/" : pathname;
 
@@ -214,8 +214,8 @@ export function getRouteMeta(
 
   const workMatch = path.match(/^\/work\/([^/]+)\/?$/);
   if (workMatch) {
-    const study = data.caseStudies.find((c) => c.slug === workMatch[1]);
-    if (study) return getWorkMeta(study);
+    const campaign = data.campaigns.find((c) => c.slug === workMatch[1]);
+    if (campaign) return getWorkMeta(campaign);
   }
 
   const insightMatch = path.match(/^\/insights\/([^/]+)\/?$/);

@@ -44,52 +44,9 @@ export const ecosystemNodes: EcosystemNode[] = [
   },
 ];
 
-export type WorkItem = {
-  id: string;
-  title: string;
-  teaser: string;
-  mediums: string[];
-  /** Campaign key visual (portrait-leaning, subject in the upper-middle). */
-  image: string;
-};
-
-export const workItems: WorkItem[] = [
-  {
-    id: "work-01",
-    image: "/assets/work/work-01.jpg",
-    title: "A story that started with one idea.",
-    teaser: "It didn't begin in a media plan.",
-    mediums: ["Strategy", "Film", "Outdoor", "Social"],
-  },
-  {
-    id: "work-02",
-    image: "/assets/work/work-02.jpg",
-    title: "The campaign people couldn't ignore.",
-    teaser: "Some things aren't meant to be skipped.",
-    mediums: ["Television", "PR", "Digital"],
-  },
-  {
-    id: "work-03",
-    image: "/assets/work/work-03.jpg",
-    title: "From a thought to a movement.",
-    teaser: "It travelled further than the media plan said it would.",
-    mediums: ["Print", "Experiences", "Social"],
-  },
-  {
-    id: "work-04",
-    image: "/assets/work/work-04.jpg",
-    title: "Conversations that counted.",
-    teaser: "The comments were the campaign.",
-    mediums: ["PR", "Digital", "Radio"],
-  },
-  {
-    id: "work-05",
-    image: "/assets/work/work-05.jpg",
-    title: "An idea that travelled far.",
-    teaser: "One thought, five mediums, one thread.",
-    mediums: ["Outdoor", "Television", "Digital", "Events"],
-  },
-];
+// Real work data lives in ./campaigns.ts (full multi-channel stories) and
+// ./samples.ts (standalone single-medium pieces), not here — see
+// public/assets/work/README.md for how that material was sourced.
 
 export const siloScenes = [
   { id: "print", label: "Print" },

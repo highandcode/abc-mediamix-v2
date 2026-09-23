@@ -9,14 +9,14 @@ const ssrDir = path.join(root, "dist-ssr");
 
 const SITE_URL = "https://abcmediamix.com";
 
-const { render, caseStudies, articles } = await import(
+const { render, campaigns, articles } = await import(
   path.join(ssrDir, "entry-server.js")
 );
 
 const template = fs.readFileSync(path.join(distDir, "index.html"), "utf-8");
 
 const staticRoutes = ["/", "/work", "/approach", "/about", "/insights", "/contact"];
-const workRoutes = caseStudies.map((c) => `/work/${c.slug}`);
+const workRoutes = campaigns.map((c) => `/work/${c.slug}`);
 const insightRoutes = articles.map((a) => `/insights/${a.slug}`);
 const routes = [...staticRoutes, ...workRoutes, ...insightRoutes];
 
