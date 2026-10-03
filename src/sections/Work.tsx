@@ -25,7 +25,7 @@ export default function Work() {
     >
       <div className="mx-auto w-full max-w-[1440px] px-6 lg:px-12">
         <div className="max-w-xl short:max-w-none">
-          <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">CURIOUS?</p>
+          <p className="text-[13px] font-bold tracking-[0.28em] sm:text-[15px] text-gold">CURIOUS?</p>
           <h2 className="mt-3 font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-ink short:mt-1 short:text-xl sm:text-4xl">
             See how we turn ideas into impact.
           </h2>

@@ -13,7 +13,7 @@ export default function EditorialLabel({
   return (
     <p
       className={clsx(
-        "text-[11px] font-semibold tracking-[0.3em]",
+        "text-[13px] font-bold tracking-[0.28em] sm:text-[15px]",
         tone === "gold" && "text-gold",
         tone === "ink" && "text-ink-soft",
         tone === "ivory" && "text-ivory/70",

@@ -263,12 +263,9 @@ button {
   }
 }
 
-/* Hero video: the clip is portrait. Upright screens fill with it as-is; on
-   landscape screens it is turned 90deg (a top-down desk has no "up"), so the
-   whole scene covers the frame edge to edge instead of a thin cropped slice.
-   The frame is a size container so the turned video can be sized from it. */
+/* Hero video: a 16:9 clip that covers the whole hero edge to edge on any
+   screen; upright screens crop the sides around the centre of the desk. */
 .hero-video-frame {
-  container-type: size;
   overflow: hidden;
 }
 .hero-video {
@@ -278,32 +275,30 @@ button {
   height: 100%;
   object-fit: cover;
 }
-@media (orientation: landscape) {
-  .hero-video {
-    inset: auto;
-    top: 50%;
-    left: 50%;
-    width: 100cqh;
-    height: 100cqw;
-    transform: translate(-50%, -50%) rotate(-90deg);
-  }
-}
 
-/* Ivory wash over the video: keeps the navy headline legible. Heavier on the
-   copy side (left) when landscape, lighter over the right. */
+/* Ivory wash over the video: kept light so the footage stays clear — just
+   enough behind the copy for the navy headline to hold over newsprint. */
 .hero-wash {
-  background: linear-gradient(180deg, rgba(244, 241, 234, 0.9) 0%, rgba(244, 241, 234, 0.78) 100%);
+  background: rgba(244, 241, 234, 0.35);
 }
 @media (orientation: landscape) {
   .hero-wash {
     background: linear-gradient(
       90deg,
-      rgba(244, 241, 234, 0.92) 0%,
-      rgba(244, 241, 234, 0.8) 40%,
-      rgba(244, 241, 234, 0.3) 75%,
-      rgba(244, 241, 234, 0.15) 100%
+      rgba(244, 241, 234, 0.5) 0%,
+      rgba(244, 241, 234, 0.3) 40%,
+      rgba(244, 241, 234, 0) 65%
     );
   }
+}
+
+/* Soft ivory halo around the hero copy, so the text holds when newsprint
+   passes behind it without fading the video itself. */
+.hero-copy-halo {
+  text-shadow:
+    0 0 2px rgba(244, 241, 234, 0.9),
+    0 0 14px rgba(244, 241, 234, 0.85),
+    0 0 28px rgba(244, 241, 234, 0.6);
 }
 
 /* Approach wheel: one square "board" whose side (--s) every part of the

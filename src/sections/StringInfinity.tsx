@@ -7,13 +7,10 @@ import { useReducedMotion } from "../hooks/useReducedMotion";
 const CX = 300;
 const CY = 200;
 
+// Start at the center crossing so the draw-on begins mid-figure without a
+// straight connector segment.
 function buildPath() {
-  const loop = infinityPath(CX, CY, 260, 130, 140);
-  const firstComma = loop.indexOf(",");
-  const firstL = loop.indexOf("L", firstComma);
-  const startX = loop.slice(1, loop.indexOf(","));
-  const startY = loop.slice(loop.indexOf(",") + 1, firstL);
-  return `M${CX},${CY} L${startX},${startY} ${loop.slice(firstL)}`;
+  return infinityPath(CX, CY, 260, 130, 140, Math.PI / 2);
 }
 
 export default function StringInfinity() {

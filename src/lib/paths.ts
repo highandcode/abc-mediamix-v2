@@ -1,15 +1,19 @@
-/** Parametric lemniscate (figure-eight / infinity curve) as an SVG path string. */
+/**
+ * Parametric lemniscate (figure-eight / infinity curve) as an SVG path string.
+ * `startAngle` of π/2 starts (and ends) the curve at its center crossing.
+ */
 export function infinityPath(
   cx: number,
   cy: number,
   width: number,
   height: number,
-  samples = 120
+  samples = 120,
+  startAngle = 0
 ): string {
   const a = width / 2;
   const points: [number, number][] = [];
   for (let i = 0; i <= samples; i++) {
-    const t = (i / samples) * Math.PI * 2;
+    const t = startAngle + (i / samples) * Math.PI * 2;
     const denom = 1 + Math.sin(t) * Math.sin(t);
     const x = (a * Math.cos(t)) / denom;
     const y = ((height / width) * a * Math.sin(t) * Math.cos(t)) / denom;

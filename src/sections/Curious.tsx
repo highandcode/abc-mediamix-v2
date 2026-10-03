@@ -19,7 +19,7 @@ export default function Curious() {
   return (
     <section id="curious" className="relative flex h-[100svh] flex-col justify-center overflow-hidden bg-ivory px-6 pb-6 pt-[var(--nav-h)]">
       <div className="mx-auto max-w-4xl text-center">
-        <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">LOOK CLOSER.</p>
+        <p className="text-[13px] font-bold tracking-[0.28em] sm:text-[15px] text-gold">LOOK CLOSER.</p>
         <p className="mt-2 text-xs text-ink-soft">There&apos;s more to this story &mdash; drag to reveal it.</p>
 
         <div

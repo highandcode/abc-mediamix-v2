@@ -84,32 +84,29 @@ const FRAME_SHAPES: Record<string, JSX.Element> = {
   ),
 };
 
+const HEADING_WORDS = ["We", "break", "silos."];
+
 export default function BreakSilos() {
   const sectionRef = useRef<HTMLElement>(null);
   const frameRefs = useRef<(HTMLDivElement | null)[]>([]);
   const labelRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const threadRef = useRef<SVGPathElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const panelTopRef = useRef<HTMLDivElement>(null);
+  const panelBottomRef = useRef<HTMLDivElement>(null);
+  const seamRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const eyebrowRef = useRef<HTMLParagraphElement>(null);
+  const wordRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const stageRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
-
-  // Play the background video only while the section is on screen.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || reducedMotion || typeof IntersectionObserver === "undefined") return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void video.play().catch(() => {});
-      else video.pause();
-    }, { threshold: 0.25 });
-    io.observe(video);
-    return () => io.disconnect();
-  }, [reducedMotion]);
 
   useEffect(() => {
     const section = sectionRef.current;
     const thread = threadRef.current;
-    if (!section || !thread) return;
+    const panels = [panelTopRef.current, panelBottomRef.current];
+    if (!section || !thread || !panels[0] || !panels[1]) return;
 
     if (reducedMotion) {
+      gsap.set(panels, { autoAlpha: 0 });
       frameRefs.current.forEach((f, i) => f && gsap.set(f, { opacity: i === 0 ? 1 : 0 }));
       return;
     }
@@ -117,19 +114,50 @@ export default function BreakSilos() {
     prepareDraw(thread);
     const n = siloScenes.length;
     const TOTAL_DURATION = 3.3;
+    // The split reveal runs first; the silo frames sequence starts after it.
+    const SILOS_AT = 1.9;
 
     let cinematic: ReturnType<typeof registerCinematicSection> | null = null;
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ paused: true });
 
-      tl.to(thread, { strokeDashoffset: 0, ease: "none", duration: TOTAL_DURATION }, 0);
+      // 1. Vertical split reveal: the section arrives covered by two ivory
+      //    halves (carrying on from the ivory section above). A gold seam
+      //    draws across the middle, then the halves part — top up, bottom
+      //    down — each taking its half of the seam with it.
+      tl.fromTo(
+        seamRefs.current,
+        { scaleX: 0 },
+        { scaleX: 1, duration: 0.5, ease: "power2.inOut" },
+        0
+      );
+      tl.fromTo(panels[0], { yPercent: 0 }, { yPercent: -100, duration: 1.05, ease: "power3.inOut" }, 0.45);
+      tl.fromTo(panels[1], { yPercent: 0 }, { yPercent: 100, duration: 1.05, ease: "power3.inOut" }, 0.45);
+
+      // 2. The heading comes up out of the opening, word by word.
+      tl.fromTo(
+        eyebrowRef.current,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+        0.85
+      );
+      tl.fromTo(
+        wordRefs.current,
+        { yPercent: 110 },
+        { yPercent: 0, duration: 0.7, ease: "power3.out", stagger: 0.09 },
+        0.95
+      );
+      tl.fromTo(stageRef.current, { opacity: 0 }, { opacity: 1, duration: 0.4 }, SILOS_AT - 0.2);
+
+      // 3. Then the silos sequence: one medium after another along the thread.
+      tl.to(thread, { strokeDashoffset: 0, ease: "none", duration: TOTAL_DURATION }, SILOS_AT);
 
       const segment = TOTAL_DURATION / n;
 
       frameRefs.current.forEach((frame, i) => {
         if (!frame) return;
-        const start = i * segment;
+        const start = SILOS_AT + i * segment;
         if (i > 0) {
           tl.to(frameRefs.current[i - 1], { opacity: 0, scale: 0.94, duration: segment * 0.4 }, start - segment * 0.15);
         }
@@ -166,37 +194,28 @@ export default function BreakSilos() {
       ref={sectionRef}
       className="relative isolate flex h-[100svh] flex-col items-center justify-center overflow-hidden bg-navy px-6 pb-6 pt-[var(--nav-h)] text-ivory"
     >
-      {/* Experiment: video behind the section, under a navy tint so the
-          ivory type and line drawings stay legible. The clip is a portrait
-          shot, so it's shown whole (not cropped) against the left edge — the
-          pencils stay in frame — and the element's own background is the
-          paper's blue, which carries the frame on across the rest of the
-          screen. It only plays while the section is on screen. */}
-      <video
-        ref={videoRef}
-        className="pointer-events-none absolute inset-0 -z-20 h-full w-full bg-[#14b5fd] object-contain object-left"
-        src="/assets/silos-bg.mp4"
-        poster="/assets/silos-bg-poster.jpg"
-        muted
-        loop
-        playsInline
-        preload="metadata"
-        aria-hidden="true"
-      />
-      {/* feathers the right edge of the (portrait) frame into the flat blue beside it */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 -z-20 w-[min(100%,56.25svh)] bg-[linear-gradient(90deg,transparent_70%,#14b5fd_100%)]"
-      />
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 bg-navy/60" />
-
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">NOT CHANNELS.</p>
+        <p ref={eyebrowRef} className="text-[13px] font-bold tracking-[0.28em] sm:text-[15px] text-gold">
+          NOT CHANNELS.
+        </p>
         <h2 className="mt-3 font-display text-3xl font-extrabold uppercase leading-tight tracking-tight short:text-2xl sm:text-5xl">
-          We break silos.
+          {HEADING_WORDS.map((word, i) => (
+            <span key={word} className="inline-block overflow-hidden pb-[0.08em] align-bottom">
+              <span
+                ref={(el) => {
+                  wordRefs.current[i] = el;
+                }}
+                className={`inline-block ${i === HEADING_WORDS.length - 1 ? "text-gold" : ""}`}
+              >
+                {word}
+              </span>
+              {i < HEADING_WORDS.length - 1 && "\u00a0"}
+            </span>
+          ))}
         </h2>
       </div>
 
+      <div ref={stageRef} className="flex flex-col items-center">
       <div className="silo-stage relative mt-[min(3.5rem,5svh)] text-ivory/80">
         <svg
           className="pointer-events-none absolute -inset-x-20 top-1/2 -z-10 h-8 -translate-y-1/2 sm:-inset-x-32"
@@ -241,6 +260,35 @@ export default function BreakSilos() {
             {scene.label}
           </span>
         ))}
+      </div>
+      </div>
+
+      {/* The two halves of the split reveal, each with its half of the gold
+          seam on its inner edge. They sit over everything and leave the
+          frame when the section opens. */}
+      <div
+        ref={panelTopRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 z-30 h-1/2 bg-ivory-deep will-change-transform"
+      >
+        <span
+          ref={(el) => {
+            seamRefs.current[0] = el;
+          }}
+          className="absolute inset-x-0 bottom-0 h-px bg-gold"
+        />
+      </div>
+      <div
+        ref={panelBottomRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-1/2 bg-ivory-deep will-change-transform"
+      >
+        <span
+          ref={(el) => {
+            seamRefs.current[1] = el;
+          }}
+          className="absolute inset-x-0 top-0 h-px bg-gold"
+        />
       </div>
     </section>
   );

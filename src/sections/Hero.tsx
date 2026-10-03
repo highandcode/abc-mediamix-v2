@@ -6,6 +6,10 @@ import { requestSectionById } from "../lib/sectionNavigator";
 
 const SOUND_PREF_KEY = "abc-hero-sound";
 const SOUND_VOLUME = 0.6;
+// The current clip (newspaper and coffee on a desk) is silent, so the sound toggle
+// and its autoplay-audio handling are switched off. Set back to true if the
+// hero video is swapped for one with an audio track.
+const VIDEO_HAS_AUDIO = false;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -51,7 +55,7 @@ export default function Hero() {
   useEffect(() => {
     const video = videoRef.current;
     const section = sectionRef.current;
-    if (!video || !section || reducedMotion) return;
+    if (!VIDEO_HAS_AUDIO || !video || !section || reducedMotion) return;
 
     video.muted = true;
     video.volume = 0;
@@ -167,11 +171,11 @@ export default function Hero() {
       ref={sectionRef}
       className="relative h-[100svh] overflow-hidden bg-ivory pb-16 pt-[var(--nav-h)] short:pb-4 lg:pb-12"
     >
-      {/* Experiment: full-bleed video behind the hero (see .hero-video in
-          globals.css — turned 90deg on landscape screens so the whole desk
-          scene fills the frame). The ivory wash keeps the navy headline
-          legible. Under reduced motion the poster frame stands in for the
-          playing video. */}
+      {/* Full-bleed video behind the hero: a newspaper and coffee on a desk,
+          shot top-down (Pexels #3945146), graded so the white desk matches the
+          site's ivory. The wash is kept light so the footage reads clearly.
+          Under reduced motion the poster frame stands in for the playing
+          video. */}
       <div aria-hidden="true" className="hero-video-frame pointer-events-none absolute inset-0">
         <video
           ref={videoRef}
@@ -191,7 +195,7 @@ export default function Hero() {
           whole hero — headline, copy and CTA — is on screen at once,
           whatever the window. */}
       <div className="relative z-10 mx-auto flex h-full w-full max-w-[1440px] flex-col items-start justify-center gap-4 px-6 short:gap-3 lg:flex-row lg:items-center lg:gap-12 lg:px-12">
-        <div className="contents lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:justify-center lg:gap-[min(2rem,4svh)]">
+        <div className="hero-copy-halo contents lg:flex lg:min-w-0 lg:flex-1 lg:flex-col lg:justify-center lg:gap-[min(2rem,4svh)]">
           <h1
             ref={headlineRef}
             className="hero-headline order-1 max-w-xl font-display lg:max-w-none font-extrabold uppercase leading-[0.95] tracking-tight text-ink"
@@ -231,7 +235,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {!reducedMotion && (
+      {VIDEO_HAS_AUDIO && !reducedMotion && (
         <button
           ref={soundBtnRef}
           type="button"

@@ -76,7 +76,7 @@ export default function Ecosystem() {
     >
       <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center gap-4 short:grid short:grid-cols-[minmax(0,1fr)_auto] short:grid-rows-[1fr_auto] short:items-center short:gap-x-10 short:gap-y-2 sm:gap-5">
         <div className="mx-auto max-w-xl text-center short:col-start-1 short:row-start-1 short:self-end short:text-left">
-          <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">ONE IDEA.</p>
+          <p className="text-[13px] font-bold tracking-[0.28em] sm:text-[15px] text-gold">ONE IDEA.</p>
           <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight text-ink sm:text-4xl">
             Many possibilities.
           </h2>

@@ -4,7 +4,7 @@ export default function Belief() {
   return (
     <section id="about" className="relative flex h-[100svh] flex-col justify-center overflow-hidden bg-ivory px-6 pb-6 pt-[var(--nav-h)]">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="text-[11px] font-semibold tracking-[0.3em] text-gold">ONE PARTNER. ONE VISION.</p>
+        <p className="text-[13px] font-bold tracking-[0.28em] sm:text-[15px] text-gold">ONE PARTNER. ONE VISION.</p>
         <h2 className="mt-4 font-display text-3xl font-extrabold uppercase leading-[1.05] tracking-tight text-ink short:text-2xl sm:text-5xl">
           We don&apos;t sell channels.
           <br />
