@@ -3,6 +3,7 @@ import { gsap } from "../lib/gsap";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { useLenisScrollTo } from "../hooks/useLenisScrollTo";
 import { requestSectionById } from "../lib/sectionNavigator";
+import { onPreloaderDone } from "../lib/preloader";
 
 const SOUND_PREF_KEY = "abc-hero-sound";
 const SOUND_VOLUME = 0.6;
@@ -32,17 +33,24 @@ export default function Hero() {
     const cta = ctaRef.current;
     if (!headline || !para || !cta) return;
 
+    let reveal: gsap.core.Timeline | null = null;
     const ctx = gsap.context(() => {
       gsap.set([headline, para, cta], { opacity: 0, y: 16 });
 
-      gsap
-        .timeline({ delay: 0.1 })
+      reveal = gsap
+        .timeline({ delay: 0.1, paused: true })
         .to(headline, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, 0)
         .to(para, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.35)
         .to(cta, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.5);
     }, sectionRef);
 
-    return () => ctx.revert();
+    // Played as the first-load preloader lifts, not underneath it.
+    const off = onPreloaderDone(() => reveal?.play());
+
+    return () => {
+      off();
+      ctx.revert();
+    };
   }, [reducedMotion]);
 
   // The typing sound is the video's own audio track, so it stays in step with

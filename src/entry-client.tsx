@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App";
 import "./styles/globals.css";
+import { startPreloader } from "./lib/preloader";
 
 const container = document.getElementById("root")!;
 const app = (
@@ -27,3 +28,7 @@ if (container.hasChildNodes()) {
 } else {
   ReactDOM.createRoot(container).render(app);
 }
+
+// After React has committed its first frame, so the hero video it renders
+// (dev renders fresh rather than hydrating) is in the DOM to wait for.
+requestAnimationFrame(() => startPreloader());
